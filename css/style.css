@@ -1,4 +1,4 @@
-:root {
+root {
     --white: #ffffff;
     --pink-light: #fdf2f8;
     --pink-border: #fbcfe8;
@@ -176,6 +176,8 @@ body {
     text-decoration: none;
     font-weight: 600;
 }
+
+
 
 /* Tablets e Desktop */
 @media (min-width: 768px) {

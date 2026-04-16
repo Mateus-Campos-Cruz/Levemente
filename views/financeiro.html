@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Financeiro</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="financeiro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><h2>LEVEMENTE</h2></div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="agenda.html"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+            <a href="pacientes.html"><i class="fas fa-users"></i> <span>Pacientes</span></a>
+            <a href="#" class="active"><i class="fas fa-wallet"></i> <span>Financeiro</span></a>
+            <a href="configuracoes.html"><i class="fas fa-cog"></i> <span>Configurações</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="finance-period">
+                <button class="btn-nav"><i class="fas fa-chevron-left"></i></button>
+                <strong>Abril 2026</strong>
+                <button class="btn-nav"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <button class="btn-primary" onclick="openModal('newTransaction')">
+                <i class="fas fa-plus-circle"></i> <span>Lançar Valor</span>
+            </button>
+        </header>
+
+        <section class="content-padding">
+            <div class="finance-summary">
+                <div class="card mini-card income">
+                    <span>Receitas</span>
+                    <h3>R$ 5.850,00</h3>
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="card mini-card expense">
+                    <span>Despesas</span>
+                    <h3>R$ 1.200,00</h3>
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="card mini-card balance">
+                    <span>Saldo Total</span>
+                    <h3>R$ 4.650,00</h3>
+                    <i class="fas fa-equals"></i>
+                </div>
+            </div>
+
+            <div class="card transaction-card">
+                <div class="card-header">
+                    <h3>Fluxo de Caixa</h3>
+                    <div class="filters">
+                        <select id="filter-type">
+                            <option value="all">Tudo</option>
+                            <option value="in">Entradas</option>
+                            <option value="out">Saídas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="transaction-list">
+                    <div class="transaction-item in">
+                        <div class="t-icon"><i class="fas fa-user-check"></i></div>
+                        <div class="t-details">
+                            <strong>Ana Clara Silva</strong>
+                            <span>Sessão de Psicoterapia</span>
+                        </div>
+                        <div class="t-date">15/04/2026</div>
+                        <div class="t-status"><span class="badge paid">Pago</span></div>
+                        <div class="t-value">R$ 150,00</div>
+                    </div>
+
+                    <div class="transaction-item out">
+                        <div class="t-icon"><i class="fas fa-building"></i></div>
+                        <div class="t-details">
+                            <strong>Aluguel Consultório</strong>
+                            <span>Despesa Fixa</span>
+                        </div>
+                        <div class="t-date">10/04/2026</div>
+                        <div class="t-status"><span class="badge paid">Pago</span></div>
+                        <div class="t-value">- R$ 800,00</div>
+                    </div>
+
+                    <div class="transaction-item in">
+                        <div class="t-icon"><i class="fas fa-user-check"></i></div>
+                        <div class="t-details">
+                            <strong>Ricardo Oliveira</strong>
+                            <span>Sessão de Psicoterapia</span>
+                        </div>
+                        <div class="t-date">16/04/2026</div>
+                        <div class="t-status"><span class="badge pending">Pendente</span></div>
+                        <div class="t-value">R$ 150,00</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>

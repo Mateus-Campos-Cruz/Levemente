@@ -1,0 +1,185 @@
+/* Reutiliza as variáveis do dashboard.css */
+
+.calendar-container {
+    background: var(--white);
+    border-radius: 24px;
+    border: 1px solid var(--pink-border);
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: var(--pink-light);
+    text-align: center;
+    font-weight: 700;
+    color: var(--pink-accent);
+    padding: 15px 0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 120px; /* Altura fixa para os dias no Desktop */
+}
+
+.day {
+    border: 0.5px solid var(--pink-light);
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+}
+
+.day:hover {
+    background-color: var(--pink-light);
+}
+
+.day.today {
+    background-color: rgba(219, 39, 119, 0.05);
+    font-weight: 800;
+    color: var(--pink-accent);
+}
+
+.day-off {
+    color: #cbd5e1;
+    background-color: #f8fafc;
+}
+
+/* Marcações e Badges */
+.event-dot {
+    height: 6px;
+    width: 6px;
+    background-color: var(--pink-accent);
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.event-badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.event-badge.confirmed { background: #dcfce7; color: #166534; border-left: 3px solid #22c55e; }
+.event-badge.pending { background: #fef9c3; color: #854d0e; border-left: 3px solid #eab308; }
+
+/* Detalhes do Dia */
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--pink-light);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-indicator.confirmed { background: #22c55e; }
+
+.event-item .info { flex: 1; display: flex; flex-direction: column; }
+.event-item .info strong { font-size: 0.95rem; color: var(--text-main); }
+.event-item .info span { font-size: 0.8rem; color: var(--text-muted); }
+
+.actions button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.actions button:hover { color: var(--pink-accent); }
+.actions .btn-danger:hover { color: #ef4444; }
+
+/* Layout da Barra Superior */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: #ffffff;
+    border-bottom: 1px solid #fbcfe8; /* Rosa claro de borda */
+}
+
+/* Container dos controles de mês ( < Abril 2026 > ) */
+.calendar-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.calendar-controls h2 {
+    font-size: 1.4rem;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* Botões de Navegação (< e >) */
+.btn-nav {
+    background: #fdf2f8; /* Fundo rosa bem clarinho */
+    border: 1px solid #fbcfe8;
+    color: #db2777; /* Rosa forte Levemente */
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-nav:hover {
+    background: #db2777;
+    color: #ffffff;
+}
+
+/* Botão + Nova Sessão (Direita) */
+.btn-new-event {
+    background-color: #db2777;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-new-event:hover {
+    background-color: #be185d;
+    transform: translateY(-2px);
+}
+
+/* Responsividade Mobile First */
+@media (max-width: 600px) {
+    .calendar-grid {
+        grid-auto-rows: 60px; /* Dias menores no celular */
+    }
+    
+    .event-badge {
+        display: none; /* Esconde texto do badge no grid pequeno */
+    }
+
+    .calendar-weekdays {
+        font-size: 0.65rem;
+    }
+    
+    .calendar-controls h2 {
+        font-size: 1.1rem;
+    }
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Agenda</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="agenda.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><h2>LEVEMENTE</h2></div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="#" class="active"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+            <a href="pacientes.html"><i class="fas fa-users"></i> <span>Pacientes</span></a>
+            <a href="financeiro.html"><i class="fas fa-wallet"></i> <span>Financeiro</span></a>
+            <a href="configuracoes.html"><i class="fas fa-cog"></i> <span>Configurações</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="calendar-controls">
+                <button class="btn-nav"><i class="fas fa-chevron-left"></i></button>
+                <h2 id="current-month">Abril 2026</h2>
+                <button class="btn-nav"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <button class="btn-new-event" onclick="openModal('eventModal')">
+                <i class="fas fa-plus"></i> <span>Nova Sessão</span>
+            </button>
+        </header>
+
+        <section class="content-padding">
+            <div class="calendar-container">
+                <div class="calendar-weekdays">
+                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                </div>
+                
+                <div class="calendar-grid">
+                    <div class="day day-off">29</div><div class="day day-off">30</div><div class="day day-off">31</div>
+                    
+                    <div class="day">1</div><div class="day">2</div><div class="day">3</div>
+                    <div class="day">4 <span class="event-dot"></span></div>
+                    <div class="day today">5 <span class="event-dot"></span></div>
+                    <div class="day">6</div>
+                    <div class="day has-events">
+                        7
+                        <div class="event-badge confirmed">09:00 - Ana</div>
+                        <div class="event-badge pending">14:00 - João</div>
+                    </div>
+                    <div class="day">8</div><div class="day">9</div><div class="day">10</div>
+                </div>
+            </div>
+
+            <div class="day-details-card card">
+                <h3>Sessões em 07 de Abril</h3>
+                <div class="event-item">
+                    <span class="status-indicator confirmed"></span>
+                    <div class="info">
+                        <strong>Ana Clara Silva</strong>
+                        <span>09:00 - Psicoterapia Individual</span>
+                    </div>
+                    <div class="actions">
+                        <button title="Remarcar"><i class="fas fa-sync-alt"></i></button>
+                        <button title="Falta" class="btn-danger"><i class="fas fa-user-times"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>LEVEMENTE</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="agenda.html"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+            <a href="pacientes.html"><i class="fas fa-users"></i> <span>Pacientes</span></a>
+            <a href="financeiro.html"><i class="fas fa-wallet"></i> <span>Financeiro</span></a>
+            <a href="configuracoes.html"><i class="fas fa-cog"></i> <span>Configurações</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="user-info">
+                <span>Olá, <strong>Mateus</strong></span>
+                <div class="avatar">M</div>
+            </div>
+        </header>
+
+        <section class="content-padding">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <i class="fas fa-user-check"></i>
+                    <div class="metric-info">
+                        <h3>Pacientes Ativos</h3>
+                        <p>24</p>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <i class="fas fa-calendar-day"></i>
+                    <div class="metric-info">
+                        <h3>Sessões Hoje</h3>
+                        <p>6</p>
+                    </div>
+                </div>
+                <div class="metric-card accent">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <div class="metric-info">
+                        <h3>Faturamento Mês</h3>
+                        <p>R$ 4.200</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-layout">
+                <div class="card sessions-card">
+                    <div class="card-header">
+                        <h3>Sessões Pendentes (Hoje)</h3>
+                        <a href="#" class="view-all">Ver Agenda</a>
+                    </div>
+                    <ul class="session-list">
+                        <li class="session-item">
+                            <div class="session-time">09:00</div>
+                            <div class="session-details">
+                                <strong>Ana Clara Silva</strong>
+                                <span>Psicoterapia Individual</span>
+                            </div>
+                            <button class="btn-action">Iniciar</button>
+                        </li>
+                        <li class="session-item">
+                            <div class="session-time">10:30</div>
+                            <div class="session-details">
+                                <strong>Ricardo Oliveira</strong>
+                                <span>Primeira Consulta</span>
+                            </div>
+                            <button class="btn-action">Iniciar</button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card recent-patients">
+                    <div class="card-header">
+                        <h3>Evoluções Recentes</h3>
+                    </div>
+                    <div class="empty-state">
+                        <p>Todas as evoluções de hoje estão em dia.</p>
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

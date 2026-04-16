@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Pacientes</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="pacientes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><h2>LEVEMENTE</h2></div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="agenda.html"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+            <a href="pacientes.html" class="active"><i class="fas fa-users"></i> <span>Pacientes</span></a>
+            <a href="financeiro.html"><i class="fas fa-wallet"></i> <span>Financeiro</span></a>
+            <a href="configuracoes.html"><i class="fas fa-cog"></i> <span>Configurações</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="patientSearch" placeholder="Buscar por nome ou CPF..." onkeyup="filterPatients()">
+            </div>
+            <button class="btn-primary" onclick="openModal('patientModal')">
+                <i class="fas fa-user-plus"></i> <span class="hide-mobile">Novo Paciente</span>
+            </button>
+        </header>
+
+        <section class="content-padding">
+            <div class="page-header">
+                <h2>Meus Pacientes</h2>
+                <span class="badge-count">24 Total</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="patient-table" id="patientTable">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>CPF</th>
+                            <th class="hide-tablet">Última Sessão</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="patient-info">
+                                <div class="avatar-small">AC</div>
+                                <div>
+                                    <strong>Ana Clara Silva</strong>
+                                    <span>(31) 98888-0000</span>
+                                </div>
+                            </td>
+                            <td>123.456.789-00</td>
+                            <td class="hide-tablet">05/04/2026</td>
+                            <td><span class="status-tag active">Ativo</span></td>
+                            <td class="actions">
+                                <button class="btn-icon" title="Prontuário"><i class="fas fa-file-medical"></i></button>
+                                <button class="btn-icon" title="Editar"><i class="fas fa-edit"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="patient-info">
+                                <div class="avatar-small">RO</div>
+                                <div>
+                                    <strong>Ricardo Oliveira</strong>
+                                    <span>(31) 97777-1111</span>
+                                </div>
+                            </td>
+                            <td>987.654.321-11</td>
+                            <td class="hide-tablet">02/04/2026</td>
+                            <td><span class="status-tag inactive">Inativo</span></td>
+                            <td class="actions">
+                                <button class="btn-icon" title="Prontuário"><i class="fas fa-file-medical"></i></button>
+                                <button class="btn-icon" title="Editar"><i class="fas fa-edit"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

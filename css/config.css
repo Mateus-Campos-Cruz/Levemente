@@ -1,0 +1,158 @@
+/* Layout da Área de Configurações */
+.config-container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Menu Lateral de Configurações */
+.config-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-item {
+    background: transparent;
+    border: none;
+    padding: 15px 20px;
+    text-align: left;
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: 0.2s;
+}
+
+.menu-item i { font-size: 1.1rem; }
+
+.menu-item:hover {
+    background: var(--white);
+    color: var(--pink-accent);
+}
+
+.menu-item.active {
+    background: var(--pink-accent);
+    color: var(--white);
+}
+
+.menu-item.danger {
+    margin-top: 20px;
+    color: #ef4444;
+}
+
+.menu-item.danger:hover { background: #fee2e2; }
+
+/* Conteúdo da Aba */
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.config-content h3 {
+    margin-bottom: 5px;
+    color: var(--text-main);
+}
+
+.subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 25px;
+}
+
+/* Formulário de Configuração */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--pink-border);
+    background: var(--bg-main);
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--pink-accent);
+    background: var(--white);
+}
+
+/* Garante que o botão de salvar siga o padrão da marca */
+.config-content .btn-primary, 
+.config-form button[type="submit"] {
+    background-color: #db2777; /* Rosa Levemente */
+    color: #ffffff;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.config-content .btn-primary:hover,
+.config-form button[type="submit"]:hover {
+    background-color: #be185d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(219, 39, 119, 0.2);
+}
+
+/* Ajuste para mobile */
+@media (max-width: 600px) {
+    .config-content .btn-primary {
+        width: 100%;
+    }
+}
+
+
+
+/* Responsividade */
+@media (max-width: 900px) {
+    .config-container {
+        grid-template-columns: 1fr;
+    }
+
+    .config-menu {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .menu-item {
+        white-space: nowrap;
+        padding: 10px 15px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

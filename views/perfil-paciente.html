@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Perfil do Paciente</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="perfil.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><h2>LEVEMENTE</h2></div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="agenda.html"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+            <a href="pacientes.html" class="active"><i class="fas fa-users"></i> <span>Pacientes</span></a>
+            <a href="#"><i class="fas fa-wallet"></i> <span>Financeiro</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="breadcrumb">
+                <a href="pacientes.html">Pacientes</a> / <strong>Ana Clara Silva</strong>
+            </div>
+            <div class="profile-actions">
+                <button class="btn-outline"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn-primary"><i class="fas fa-print"></i> Exportar</button>
+            </div>
+        </header>
+
+        <section class="content-padding">
+            <div class="profile-grid">
+                
+                <aside class="profile-sidebar">
+                    <div class="card patient-main-card">
+                        <div class="avatar-large">AC</div>
+                        <h2>Ana Clara Silva</h2>
+                        <span class="status-tag active">Ativo</span>
+                        <hr>
+                        <div class="quick-info">
+                            <p><i class="fas fa-birthday-cake"></i> 28 anos (15/03/1998)</p>
+                            <p><i class="fas fa-id-card"></i> 123.456.789-00</p>
+                            <p><i class="fas fa-phone"></i> (31) 98888-0000</p>
+                        </div>
+                    </div>
+
+                    <div class="card emergency-card">
+                        <h3><i class="fas fa-ambulance"></i> Emergência</h3>
+                        <div class="contact-box">
+                            <strong>Maria Silva (Mãe)</strong>
+                            <p>(31) 97777-1111</p>
+                        </div>
+                    </div>
+                </aside>
+
+                <article class="profile-main">
+                    <div class="card">
+                        <div class="tabs-internal">
+                            <button class="tab-link active">Dados Cadastrais</button>
+                            <button class="tab-link">Anamnese Inicial</button>
+                        </div>
+
+                        <div class="tab-content">
+                            <div class="info-group">
+                                <h4>Informações Gerais</h4>
+                                <div class="info-grid">
+                                    <div class="item"><span>Profissão</span><p>Designer Gráfica</p></div>
+                                    <div class="item"><span>Estado Civil</span><p>Solteira</p></div>
+                                    <div class="item"><span>Escolaridade</span><p>Superior Completo</p></div>
+                                    <div class="item"><span>Endereço</span><p>Rua das Flores, 123 - BH/MG</p></div>
+                                </div>
+                            </div>
+
+                            <div class="info-group">
+                                <h4>Anamnese Inicial</h4>
+                                <div class="text-block">
+                                    <h5>Queixa Principal</h5>
+                                    <p>Paciente relata episódios de ansiedade aguda relacionados ao ambiente de trabalho e dificuldade de concentração.</p>
+                                    
+                                    <h5>Histórico Familiar</h5>
+                                    <p>Sem histórico de patologias mentais graves na família direta. Relacionamento estável com os pais.</p>
+
+                                    <h5>Medicações em uso</h5>
+                                    <p>Nenhuma medicação psiquiátrica atual.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>

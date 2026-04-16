@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Configurações</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="config.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><h2>LEVEMENTE</h2></div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="agenda.html"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+            <a href="pacientes.html"><i class="fas fa-users"></i> <span>Pacientes</span></a>
+            <a href="financeiro.html"><i class="fas fa-wallet"></i> <span>Financeiro</span></a>
+            <a href="#" class="active"><i class="fas fa-cog"></i> <span>Configurações</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+            <h2>Configurações</h2>
+            <div class="user-info">
+                <div class="avatar">M</div>
+            </div>
+        </header>
+
+        <section class="content-padding">
+            <div class="config-container">
+                
+                <nav class="config-menu">
+                    <button class="menu-item active" onclick="showTab('profile')">
+                        <i class="fas fa-user-circle"></i> Meu Perfil
+                    </button>
+                    <button class="menu-item" onclick="showTab('security')">
+                        <i class="fas fa-shield-alt"></i> Segurança
+                    </button>
+                    <button class="menu-item" onclick="showTab('notifications')">
+                        <i class="fas fa-bell"></i> Notificações
+                    </button>
+                    <button class="menu-item danger" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Sair da Conta
+                    </button>
+                </nav>
+
+                <article class="config-content card">
+                    
+                    <div id="profile" class="tab-pane active">
+                        <h3>Dados Profissionais</h3>
+                        <p class="subtitle">Gerencie suas informações que aparecem nos recibos e prontuários.</p>
+                        
+                        <form class="config-form">
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label>Nome Completo</label>
+                                    <input type="text" value="Mateus Campos Cruz">
+                                </div>
+                                <div class="input-group">
+                                    <label>Registro Profissional (CRP)</label>
+                                    <input type="text" value="04/12345">
+                                </div>
+                                <div class="input-group">
+                                    <label>E-mail de Acesso</label>
+                                    <input type="email" value="mateus@email.com">
+                                </div>
+                                <div class="input-group">
+                                    <label>Especialidade</label>
+                                    <input type="text" placeholder="Ex: TCC, Psicanálise...">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">Salvar Alterações</button>
+                        </form>
+                    </div>
+
+                    <div id="security" class="tab-pane">
+                        <h3>Alterar Senha</h3>
+                        <form class="config-form">
+                            <div class="input-group">
+                                <label>Senha Atual</label>
+                                <input type="password" placeholder="••••••••">
+                            </div>
+                            <div class="input-group">
+                                <label>Nova Senha</label>
+                                <input type="password" placeholder="Nova senha">
+                            </div>
+                            <div class="input-group">
+                                <label>Confirmar Nova Senha</label>
+                                <input type="password" placeholder="Repita a nova senha">
+                            </div>
+                            <button type="submit" class="btn-primary">Atualizar Senha</button>
+                        </form>
+                    </div>
+
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

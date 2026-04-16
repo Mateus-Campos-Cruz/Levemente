@@ -1,0 +1,229 @@
+:root {
+    --white: #ffffff;
+    --pink-light: #fdf2f8;
+    --pink-border: #fbcfe8;
+    --pink-accent: #db2777;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --bg-main: #f8fafc;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background: var(--white);
+    border-right: 1px solid var(--pink-border);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar-header {
+    padding: 30px;
+    color: var(--pink-accent);
+    font-weight: 800;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 5px;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: var(--text-muted);
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+.sidebar-nav a.active, .sidebar-nav a:hover {
+    background: var(--pink-light);
+    color: var(--pink-accent);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-bar {
+    background: var(--white);
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    border-bottom: 1px solid var(--pink-border);
+}
+
+.menu-btn {
+    display: none; /* Escondido no Desktop */
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--pink-accent);
+    cursor: pointer;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar {
+    width: 35px;
+    height: 35px;
+    background: var(--pink-accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Metrics */
+.content-padding {
+    padding: 30px;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid var(--pink-border);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.metric-card i {
+    font-size: 2rem;
+    color: var(--pink-accent);
+    background: var(--pink-light);
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.metric-card.accent {
+    background: var(--pink-accent);
+    color: white;
+}
+
+.metric-card.accent i {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.metric-info h3 {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.metric-card.accent .metric-info h3 { color: rgba(255,255,255,0.8); }
+
+.metric-info p {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+/* Dashboard Layout */
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 20px;
+    border: 1px solid var(--pink-border);
+    padding: 25px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.session-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.session-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--pink-light);
+}
+
+.session-time {
+    font-weight: 800;
+    color: var(--pink-accent);
+    background: var(--pink-light);
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+
+.session-details { flex: 1; }
+
+.btn-action {
+    background: var(--pink-accent);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Responsividade Mobile First */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        height: 100vh;
+    }
+
+    .sidebar.active { left: 0; }
+
+    .menu-btn { display: block; }
+
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+}

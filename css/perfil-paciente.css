@@ -1,0 +1,161 @@
+/* Layout da Grid de Perfil */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 25px;
+    align-items: start;
+}
+
+/* Sidebar do Perfil */
+.patient-main-card {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.avatar-large {
+    width: 100px;
+    height: 100px;
+    background: var(--pink-light);
+    color: var(--pink-accent);
+    border-radius: 30px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+    border: 2px solid var(--pink-border);
+}
+
+.patient-main-card h2 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+}
+
+.quick-info {
+    text-align: left;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.quick-info p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.quick-info i {
+    width: 20px;
+    color: var(--pink-accent);
+    margin-right: 8px;
+}
+
+.emergency-card h3 {
+    font-size: 1rem;
+    color: #ef4444; /* Vermelho para destaque de emergência */
+    margin-bottom: 15px;
+}
+
+.contact-box {
+    background: #fff1f2;
+    padding: 12px;
+    border-radius: 12px;
+    border-left: 4px solid #ef4444;
+}
+
+/* Tabs Internas */
+.tabs-internal {
+    display: flex;
+    gap: 20px;
+    border-bottom: 2px solid var(--pink-light);
+    margin-bottom: 25px;
+}
+
+.tab-link {
+    background: none;
+    border: none;
+    padding: 10px 0;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    position: relative;
+}
+
+.tab-link.active {
+    color: var(--pink-accent);
+}
+
+.tab-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--pink-accent);
+}
+
+/* Grupos de Informação */
+.info-group {
+    margin-bottom: 30px;
+}
+
+.info-group h4 {
+    color: var(--pink-accent);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.item span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.item p {
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.text-block h5 {
+    margin: 15px 0 5px;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.text-block p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+/* Responsividade Mobile First */
+@media (max-width: 900px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-sidebar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .profile-sidebar {
+        grid-template-columns: 1fr;
+    }
+    
+    .top-bar .breadcrumb {
+        display: none;
+    }
+}

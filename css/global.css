@@ -1,0 +1,9 @@
+/* Estilos que se repetem em todo o sistema */
+.btn-primary {
+    background-color: #db2777 !important;
+    color: white !important;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+}
