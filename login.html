@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <main class="auth-container">
+        <header class="auth-header">
+            <h1>LEVEMENTE</h1>
+            <p>Sua prática clínica, mais leve.</p>
+        </header>
+
+        <section class="auth-card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="toggleAuth('login')">Entrar</button>
+                <button class="tab-btn" onclick="toggleAuth('register')">Cadastrar</button>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <div class="input-group">
+                    <label for="email">E-mail Profissional</label>
+                    <div class="input-field">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="exemplo@crp.com.br" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Senha</label>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Acessar Plataforma</button>
+                <a href="#" class="forgot-password">Esqueceu sua senha?</a>
+            </form>
+
+            <form id="register-form" class="auth-form hidden">
+                <div class="input-group">
+                    <label for="reg-nome">Nome Completo</label>
+                    <input type="text" id="reg-nome" placeholder="Seu nome" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="reg-crp">CRP (Registro Profissional)</label>
+                    <input type="text" id="reg-crp" placeholder="00/00000" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="reg-email">E-mail</label>
+                    <input type="email" id="reg-email" placeholder="seu@email.com" required>
+                </div>
+
+                <div class="lgpd-consent">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">
+                        Li e aceito a <a href="#">Política de Privacidade</a> e o tratamento de dados conforme a LGPD.
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-submit">Criar Minha Conta</button>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        function toggleAuth(type) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const btns = document.querySelectorAll('.tab-btn');
+
+            if (type === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                btns[0].classList.add('active');
+                btns[1].classList.remove('active');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                btns[1].classList.add('active');
+                btns[0].classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
