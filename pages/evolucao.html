@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Evolução do Paciente</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/evolucao.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>LEVEMENTE</h2></div>
+        <nav class="sidebar-nav">
+            <a href="../index.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="agenda.html"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+            <a href="pacientes.html" class="active"><i class="fas fa-users"></i> <span>Pacientes</span></a>
+            <a href="financeiro.html"><i class="fas fa-wallet"></i> <span>Financeiro</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="breadcrumb">
+                <a href="pacientes.html">Pacientes</a> / <a href="perfil-paciente.html">Ana Clara</a> / <strong>Evolução</strong>
+            </div>
+            <button class="btn-primary" onclick="openModal('novaEvolucao')">
+                <i class="fas fa-plus"></i> Nova Anotação
+            </button>
+        </header>
+
+        <section class="content-padding">
+            <div class="timeline">
+                <div class="card timeline-item">
+                    <div class="timeline-date">
+                        <strong>15</strong>
+                        <span>ABR</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-header">
+                            <h4>Sessão #12 - Presencial</h4>
+                            <span class="tag">Ansiedade</span>
+                        </div>
+                        <p>Paciente relatou melhora nos sintomas de insônia após início das técnicas de higiene do sono. Discutimos o gatilho ocorrido na terça-feira no trabalho...</p>
+                        <div class="content-footer">
+                            <button class="btn-text"><i class="fas fa-edit"></i> Editar</button>
+                            <button class="btn-text"><i class="fas fa-lock"></i> Sigiloso</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card timeline-item">
+                    <div class="timeline-date">
+                        <strong>08</strong>
+                        <span>ABR</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-header">
+                            <h4>Sessão #11 - Online</h4>
+                            <span class="tag">Trabalho</span>
+                        </div>
+                        <p>Foco na organização de rotina. Paciente apresenta resistência em delegar tarefas, o que aumenta a carga de estresse...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
