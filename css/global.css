@@ -1,9 +1,30 @@
-/* Estilos que se repetem em todo o sistema */
+/* css/global.css */
+:root {
+    --pink-accent: #db2777;
+    --pink-light: #fdf2f8;
+    --pink-border: #fbcfe8;
+    --text-main: #1e293b;
+    --bg-main: #f8fafc;
+    --white: #ffffff;
+}
+
+body { font-family: 'Inter', sans-serif; background: var(--bg-main); margin: 0; display: flex; }
+
+.main-content { flex: 1; min-height: 100vh; }
+
+/* Botão Padrão Levemente */
 .btn-primary {
-    background-color: #db2777 !important;
-    color: white !important;
+    background: var(--pink-accent);
+    color: var(--white);
     border: none;
     padding: 10px 20px;
     border-radius: 12px;
+    font-weight: 600;
     cursor: pointer;
+    transition: 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
+
+.btn-primary:hover { background: #be185d; transform: translateY(-1px); }

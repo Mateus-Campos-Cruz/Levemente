@@ -1,0 +1,51 @@
+/* Estilo da Tabela de Seleção */
+.receipt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.receipt-table th {
+    text-align: left;
+    padding: 12px;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--pink-border);
+}
+
+.receipt-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.btn-primary-sm {
+    background: var(--pink-accent);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* Estilo do Recibo para Impressão */
+.receipt-print {
+    padding: 50px;
+    border: 1px solid #eee;
+    background: #fff;
+    color: #000;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.receipt-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 20px; }
+.receipt-body { padding: 40px 0; line-height: 1.6; font-size: 1.1rem; }
+.receipt-footer { text-align: center; margin-top: 50px; }
+.signature-line { border-top: 1px solid #000; width: 250px; margin: 0 auto 10px; }
+
+/* REGRA DE OURO PARA PDF */
+@media print {
+    body * { visibility: hidden; }
+    #printableArea, #printableArea * { visibility: visible; }
+    #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+    .no-print { display: none; }
+}

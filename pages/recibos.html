@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Emissão de Recibos</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/recibos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar-component"></aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <h2>Emissão de Recibos</h2>
+            <div class="filters">
+                <input type="text" placeholder="Buscar paciente...">
+            </div>
+        </header>
+
+        <section class="content-padding">
+            <div class="card">
+                <h3>Pagamentos Concluídos</h3>
+                <p class="subtitle">Selecione uma sessão para gerar o recibo oficial.</p>
+                
+                <table class="receipt-table">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Data da Sessão</th>
+                            <th>Valor</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ana Clara Silva</td>
+                            <td>15/04/2026</td>
+                            <td>R$ 150,00</td>
+                            <td>
+                                <button class="btn-primary-sm" onclick="gerarRecibo('Ana Clara', '150,00', '15/04/2026')">
+                                    <i class="fas fa-file-invoice-dollar"></i> Gerar Recibo
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="receiptModal" class="modal">
+        <div class="modal-content receipt-print" id="printableArea">
+            <div class="receipt-header">
+                <h1>RECIBO DE PAGAMENTO</h1>
+                <p>Nº 001/2026</p>
+            </div>
+            <div class="receipt-body">
+                <p>Recebi de <strong>Ana Clara Silva</strong> a importância de <strong>R$ 150,00</strong> (Cento e cinquenta reais), referente a serviços de Psicoterapia Individual realizados em 15/04/2026.</p>
+            </div>
+            <div class="receipt-footer">
+                <div class="signature-line"></div>
+                <p>Mateus Campos Cruz</p>
+                <p>CRP: 04/12345</p>
+            </div>
+            <button class="no-print btn-primary" onclick="window.print()">Imprimir PDF</button>
+        </div>
+    </div>
+
+  <script src="../js/components.js"></script>
+  
+</body>
+
+
+
+</html>
