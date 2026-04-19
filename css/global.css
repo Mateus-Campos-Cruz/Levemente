@@ -57,3 +57,34 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-main); margin: 0; 
     width: 20px;
     text-align: center;
 }
+
+/* Reset fundamental */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex; /* Alinha sidebar e main lado a lado */
+    background-color: #f8fafc; /* Cor de fundo padrão */
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1; /* Ocupa todo o espaço restante após a sidebar */
+    display: flex;
+    flex-direction: column;
+}
+
+.content-padding {
+    padding: 30px; /* Margem interna para o conteúdo não colar nas bordas */
+}
+
+/* Estilo do Card (igual ao da Ana Clara) */
+.card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+}
