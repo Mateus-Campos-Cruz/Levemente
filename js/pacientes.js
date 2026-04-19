@@ -23,3 +23,18 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = "block";
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+}
+
+// Fechar se o usuário clicar fora da caixa branca
+window.onclick = function(event) {
+    if (event.target.className === 'modal') {
+        event.target.style.display = "none";
+    }
+}
