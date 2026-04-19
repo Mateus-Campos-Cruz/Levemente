@@ -17,7 +17,7 @@
             <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
             <div class="search-container">
                 <i class="fas fa-search"></i>
-                <input type="text" id="patientSearch" placeholder="Buscar por nome ou CPF..." onkeyup="filterPatients()">
+                <input type="text" id="inputBusca" placeholder="Buscar por nome ou CPF...">
             </div>
             <button class="btn-primary" onclick="openModal('patientModal')">
                 <i class="fas fa-user-plus"></i> <span class="hide-mobile">Novo Paciente</span>
@@ -31,7 +31,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="patient-table" id="patientTable">
+                <table class="patient-table">
                     <thead>
                         <tr>
                             <th>Paciente</th>
@@ -41,8 +41,8 @@
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
+                    <tbody id="tabelaPacientes">
+                        <tr class="paciente-row">
                             <td class="patient-info">
                                 <div class="avatar-small">AC</div>
                                 <div>
@@ -58,7 +58,7 @@
                                 <button class="btn-icon" title="Editar"><i class="fas fa-edit"></i></button>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="paciente-row">
                             <td class="patient-info">
                                 <div class="avatar-small">RO</div>
                                 <div>
@@ -79,6 +79,8 @@
             </div>
         </section>
     </main>
+
     <script src="../js/components.js"></script>
+    <script src="../js/pacientes.js"></script>
 </body>
 </html>
