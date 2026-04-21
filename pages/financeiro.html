@@ -1,59 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEVEMENTE | Financeiro</title>
-    <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/financeiro.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/financeiro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
+
     <aside class="sidebar" id="sidebar-component"></aside>
 
     <main class="main-content">
+
         <header class="top-bar">
-            <div class="header-info">
-                <h2>Gestão Financeira</h2>
+            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="inputBuscaFinanceiro" placeholder="Buscar lançamento...">
             </div>
             <button class="btn-primary" onclick="openModal('modalLancamento')">
-                <i class="fas fa-plus"></i> Novo Lançamento
+                <i class="fas fa-plus"></i> <span class="hide-mobile">Novo Lançamento</span>
             </button>
         </header>
 
         <section class="content-padding">
+            <div class="page-header">
+                <h2>Gestão Financeira</h2>
+                <span class="badge-count">Abril / 2026</span>
+            </div>
+
             <div class="stats-grid">
                 <div class="stat-card income">
                     <div class="stat-info">
                         <span>Receita Mensal (Pago)</span>
-                        <h3 id="receita-total">R$ 150.00</h3>
+                        <h3 id="receita-total">R$ 150,00</h3>
                     </div>
                     <i class="fas fa-arrow-up icon-bg"></i>
                 </div>
-                
+
                 <div class="stat-card pending">
                     <div class="stat-info">
                         <span>A Receber (Pendente)</span>
-                        <h3 id="pendente-total">R$ 0.00</h3>
+                        <h3 id="pendente-total">R$ 0,00</h3>
                     </div>
                     <i class="fas fa-clock icon-bg"></i>
                 </div>
             </div>
 
-            <div class="table-container card">
+            <div class="table-responsive">
                 <table class="finance-table">
                     <thead>
                         <tr>
-                            <th>DESCRIÇÃO</th>
-                            <th>PACIENTE</th>
-                            <th>VALOR</th>
-                            <th>VENCIMENTO</th>
-                            <th>STATUS</th>
-                            <th>AÇÕES</th>
+                            <th>Descrição</th>
+                            <th>Paciente</th>
+                            <th class="hide-tablet">Valor</th>
+                            <th class="hide-tablet">Vencimento</th>
+                            <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaFinanceira">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </section>
@@ -62,29 +73,32 @@
     <div id="modalLancamento" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-file-invoice-dollar"></i> Novo Lançamento</h3>
+                <h3><i class="fas fa-plus-circle"></i> Novo Lançamento</h3>
                 <button class="close-btn" onclick="closeModal('modalLancamento')">&times;</button>
             </div>
             <form id="formFinanceiro" class="modal-form">
                 <div class="form-group">
-                    <label>Descrição</label>
-                    <input type="text" name="descricao" placeholder="Ex: Sessão Semanal" required>
+                    <label for="descricao">Descrição</label>
+                    <input type="text" id="descricao" placeholder="Ex: Sessão Semanal" required>
                 </div>
+
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Valor (R$)</label>
-                        <input type="number" step="0.01" name="valor" required>
+                        <label for="valor">Valor (R$)</label>
+                        <input type="number" id="valor" step="0.01" placeholder="150.00" required>
                     </div>
                     <div class="form-group">
-                        <label>Status</label>
-                        <select name="status" class="form-select">
-                            <option value="pago">Pago</option>
-                            <option value="pendente">Pendente</option>
+                        <label for="statusLancamento">Status</label>
+                        <select id="statusLancamento" class="form-select">
+                            <option value="Pago">Pago</option>
+                            <option value="Pendente">Pendente</option>
                         </select>
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('modalLancamento')">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="closeModal('modalLancamento')">Cancelar</button>
                     <button type="submit" class="btn-primary">Salvar</button>
                 </div>
             </form>
@@ -94,4 +108,5 @@
     <script src="../js/components.js"></script>
     <script src="../js/financeiro.js"></script>
 </body>
+
 </html>

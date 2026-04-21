@@ -1,17 +1,19 @@
 /**
  * LEVEMENTE - Gestão de Pacientes
- * Lógica de Filtro, Cadastro, Máscaras e Persistência Local
+ * Lógica de Filtro, Cadastro, Máscaras e Persistência via API REST
  */
 
+const API_URL = 'http://localhost:3000/api/pacientes';
+
 document.addEventListener("DOMContentLoaded", () => {
-    // Inicialização
     carregarPacientes();
     configurarMascaras();
     configurarFiltro();
     configurarFormulario();
 });
 
-// --- FUNÇÕES DE NAVEGAÇÃO (MODAL) ---
+// --- MODAL ---
+
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.style.display = "block";
@@ -22,7 +24,6 @@ function closeModal(modalId) {
     if (modal) modal.style.display = "none";
 }
 
-// Fecha o modal ao clicar fora da área útil
 window.onclick = (event) => {
     if (event.target.classList.contains('modal')) {
         event.target.style.display = "none";
@@ -31,101 +32,180 @@ window.onclick = (event) => {
 
 // --- CORE DA APLICAÇÃO ---
 
-function configurarFormulario() {
+async function configurarFormulario() {
     const form = document.getElementById('formNovoPaciente');
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const formData = new FormData(form);
-        const novoPaciente = {
-            id: Date.now(), // ID único para controle futuro
-            nome: formData.get('nome'),
-            cpf: formData.get('cpf'),
-            status: formData.get('status'),
-            telefone: formData.get('telefone'),
-            ultimaSessao: '---'
+
+        const btnSalvar = form.querySelector('button[type="submit"]');
+        btnSalvar.disabled = true;
+        btnSalvar.textContent = 'Salvando...';
+
+        const payload = {
+            nome_completo: document.getElementById('nome').value.trim(),
+            cpf:           document.getElementById('cpf').value.trim(),
+            telefone:      document.getElementById('telefone').value.trim(),
+            status:        document.getElementById('status').value,
         };
 
-        // Persistência e Interface
-        salvarPacienteLocal(novoPaciente);
-        adicionarPacienteTabela(novoPaciente);
-        
-        // Limpeza
-        closeModal('patientModal');
-        form.reset();
-        alert("Paciente cadastrado com sucesso!");
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.erro || 'Erro ao cadastrar paciente.');
+                return;
+            }
+
+            // Adiciona na tabela sem recarregar a página
+            adicionarPacienteTabela(data);
+            atualizarContador(1);
+            closeModal('patientModal');
+            form.reset();
+
+        } catch (err) {
+            alert('Não foi possível conectar ao servidor. Verifique se o server.js está rodando.');
+            console.error(err);
+        } finally {
+            btnSalvar.disabled = false;
+            btnSalvar.textContent = 'Salvar Paciente';
+        }
     });
 }
 
 function configurarFiltro() {
     const inputBusca = document.getElementById('inputBusca');
     const tabela = document.getElementById('tabelaPacientes');
-
     if (!inputBusca || !tabela) return;
 
     inputBusca.addEventListener('input', () => {
         const termo = inputBusca.value.toLowerCase();
-        const linhas = tabela.getElementsByClassName('paciente-row');
-
-        Array.from(linhas).forEach(linha => {
-            const visivel = linha.textContent.toLowerCase().includes(termo);
-            linha.style.display = visivel ? "" : "none";
+        Array.from(tabela.getElementsByClassName('paciente-row')).forEach(linha => {
+            linha.style.display = linha.textContent.toLowerCase().includes(termo) ? '' : 'none';
         });
     });
 }
 
-// --- PERSISTÊNCIA (LOCAL STORAGE) ---
+// --- API ---
 
-function salvarPacienteLocal(paciente) {
-    const pacientes = JSON.parse(localStorage.getItem('levemente_pacientes')) || [];
-    pacientes.push(paciente);
-    localStorage.setItem('levemente_pacientes', JSON.stringify(pacientes));
+async function carregarPacientes() {
+    const tabela = document.getElementById('tabelaPacientes');
+    if (!tabela) return;
+
+    // Limpa linhas estáticas de exemplo
+    tabela.innerHTML = `
+        <tr id="loading-row">
+            <td colspan="5" style="text-align:center; padding: 30px; color: #64748b;">
+                <i class="fas fa-spinner fa-spin"></i> Carregando pacientes...
+            </td>
+        </tr>`;
+
+    try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error('Resposta inválida do servidor.');
+
+        const pacientes = await res.json();
+        tabela.innerHTML = ''; // Limpa o loading
+
+        if (pacientes.length === 0) {
+            tabela.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align:center; padding: 30px; color: #64748b;">
+                        Nenhum paciente cadastrado ainda.
+                    </td>
+                </tr>`;
+        } else {
+            pacientes.forEach(p => adicionarPacienteTabela(p));
+        }
+
+        // Atualiza o badge com total real
+        const badge = document.querySelector('.badge-count');
+        if (badge) badge.textContent = `${pacientes.length} Total`;
+
+    } catch (err) {
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center; padding: 30px; color: #ef4444;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Erro ao conectar ao servidor. Certifique-se de que o <strong>server.js</strong> está rodando.
+                </td>
+            </tr>`;
+        console.error('Erro ao carregar pacientes:', err);
+    }
 }
 
-function carregarPacientes() {
-    const pacientes = JSON.parse(localStorage.getItem('levemente_pacientes')) || [];
-    // Adiciona os pacientes salvos, mas mantém os que já estiverem no HTML (se houver)
-    pacientes.forEach(p => adicionarPacienteTabela(p));
-}
-
-// --- INTERFACE (DOM) ---
+// --- DOM ---
 
 function adicionarPacienteTabela(paciente) {
     const tabela = document.getElementById('tabelaPacientes');
     if (!tabela) return;
 
-    const iniciais = paciente.nome
+    // Gera iniciais a partir do nome_completo (coluna do banco)
+    const iniciais = (paciente.nome_completo || '')
         .split(' ')
         .map(n => n[0])
         .join('')
         .toUpperCase()
         .substring(0, 2);
-    
-    const novaLinha = document.createElement('tr');
-    novaLinha.className = 'paciente-row';
-    novaLinha.innerHTML = `
+
+    // Última sessão virá de evolucoes no futuro; por ora exibe data_cadastro
+    const ultimaSessao = paciente.ultima_sessao || paciente.data_cadastro || '---';
+
+    const statusClass = paciente.status === 'Ativo' ? 'active' : 'inactive';
+
+    const tr = document.createElement('tr');
+    tr.className = 'paciente-row';
+    tr.dataset.id = paciente.id_paciente;
+    tr.innerHTML = `
         <td class="patient-info">
             <div class="avatar-small">${iniciais}</div>
             <div>
-                <strong>${paciente.nome}</strong>
-                <span>${paciente.telefone}</span>
+                <strong>${paciente.nome_completo}</strong>
+                <span>${paciente.telefone || '—'}</span>
             </div>
         </td>
         <td>${paciente.cpf}</td>
-        <td class="hide-tablet">${paciente.ultimaSessao || '---'}</td>
-        <td><span class="status-tag ${paciente.status.toLowerCase()}">${paciente.status}</span></td>
+        <td class="hide-tablet">${ultimaSessao}</td>
+        <td><span class="status-tag ${statusClass}">${paciente.status}</span></td>
         <td class="actions">
-            <button class="btn-icon" title="Prontuário"><i class="fas fa-file-medical"></i></button>
-            <button class="btn-icon" title="Editar"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon" title="Prontuário" onclick="abrirProntuario(${paciente.id_paciente})">
+                <i class="fas fa-file-medical"></i>
+            </button>
+            <button class="btn-icon" title="Editar" onclick="editarPaciente(${paciente.id_paciente})">
+                <i class="fas fa-edit"></i>
+            </button>
         </td>
     `;
-    
-    tabela.prepend(novaLinha);
+
+    tabela.prepend(tr);
 }
 
-// --- UTILITÁRIOS (MÁSCARAS) ---
+function atualizarContador(delta) {
+    const badge = document.querySelector('.badge-count');
+    if (!badge) return;
+    const atual = parseInt(badge.textContent) || 0;
+    badge.textContent = `${atual + delta} Total`;
+}
+
+// --- AÇÕES (stubs para implementação futura) ---
+
+function abrirProntuario(id) {
+    window.location.href = `perfil-paciente.html?id=${id}`;
+}
+
+function editarPaciente(id) {
+    // TODO: abrir modal de edição com dados pré-preenchidos
+    console.log('Editar paciente ID:', id);
+}
+
+// --- MÁSCARAS ---
 
 function configurarMascaras() {
     const inputCpf = document.getElementById('cpf');
