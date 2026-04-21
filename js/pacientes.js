@@ -181,6 +181,9 @@ function adicionarPacienteTabela(paciente) {
             <button class="btn-icon" title="Editar" onclick="editarPaciente(${paciente.id_paciente})">
                 <i class="fas fa-edit"></i>
             </button>
+            <button class="btn-icon danger" title="Excluir" onclick="confirmarDelete(${paciente.id_paciente}, '${(paciente.nome_completo || '').replace(/'/g, String.fromCharCode(92, 39))}')">
+                <i class="fas fa-trash-alt"></i>
+            </button>
         </td>
     `;
 
@@ -191,7 +194,61 @@ function atualizarContador(delta) {
     const badge = document.querySelector('.badge-count');
     if (!badge) return;
     const atual = parseInt(badge.textContent) || 0;
-    badge.textContent = `${atual + delta} Total`;
+    badge.textContent = `${Math.max(0, atual + delta)} Total`;
+}
+
+// --- DELETE COM MODAL DE CONFIRMAÇÃO ---
+
+let _idParaExcluir = null;
+
+function confirmarDelete(id, nome) {
+    _idParaExcluir = id;
+    document.getElementById('deleteNomePaciente').textContent = nome;
+
+    // Recria o botão para evitar listeners duplicados
+    const btnAntigo = document.getElementById('btnConfirmarDelete');
+    const btnNovo = btnAntigo.cloneNode(true);
+    btnAntigo.parentNode.replaceChild(btnNovo, btnAntigo);
+    btnNovo.addEventListener('click', () => excluirPaciente(_idParaExcluir));
+
+    openModal('deleteModal');
+}
+
+async function excluirPaciente(id) {
+    const btn = document.getElementById('btnConfirmarDelete');
+    btn.disabled = true;
+    btn.textContent = 'Excluindo...';
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/pacientes/${id}`, {
+            method: 'DELETE',
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            alert(data.erro || 'Erro ao excluir paciente.');
+            return;
+        }
+
+        // Animação de saída antes de remover do DOM
+        const linha = document.querySelector(`tr[data-id="${id}"]`);
+        if (linha) {
+            linha.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            linha.style.opacity = '0';
+            linha.style.transform = 'translateX(20px)';
+            setTimeout(() => linha.remove(), 300);
+        }
+
+        atualizarContador(-1);
+        closeModal('deleteModal');
+
+    } catch (err) {
+        alert('Não foi possível conectar ao servidor.');
+        console.error(err);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Excluir Paciente';
+    }
 }
 
 // --- AÇÕES (stubs para implementação futura) ---

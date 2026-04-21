@@ -255,6 +255,27 @@
     color: #1e293b;
 }
 
+/* Botão de Perigo (Vermelho) */
+.btn-danger {
+    background-color: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* Ícone lixeira - cor de perigo ao hover */
+.btn-icon.danger { color: #ef4444; }
+.btn-icon.danger:hover { color: #dc2626; }
+
 /* Ajuste no rodapé do modal para espaçamento */
 .modal-footer {
     display: flex;
