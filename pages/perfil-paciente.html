@@ -16,7 +16,7 @@
         <header class="top-bar">
             <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
             <div class="breadcrumb">
-                <a href="pacientes.html">Pacientes</a> / <strong>Ana Clara Silva</strong>
+                <a href="pacientes.html">Pacientes</a> / <strong id="breadcrumb-nome">Carregando...</strong>
             </div>
             <div class="profile-actions">
                 <button class="btn-outline"><i class="fas fa-edit"></i> Editar</button>
@@ -29,22 +29,21 @@
                 
                 <aside class="profile-sidebar">
                     <div class="card patient-main-card">
-                        <div class="avatar-large">AC</div>
-                        <h2>Ana Clara Silva</h2>
-                        <span class="status-tag active">Ativo</span>
+                        <div class="avatar-large" id="profile-iniciais">--</div>
+                        <h2 id="profile-nome">Carregando...</h2>
+                        <span class="status-tag" id="profile-status">...</span>
                         <hr>
                         <div class="quick-info">
-                            <p><i class="fas fa-birthday-cake"></i> 28 anos (15/03/1998)</p>
-                            <p><i class="fas fa-id-card"></i> 123.456.789-00</p>
-                            <p><i class="fas fa-phone"></i> (31) 98888-0000</p>
+                            <p><i class="fas fa-birthday-cake"></i> <span id="profile-idade">-- anos</span> (<span id="profile-nascimento">--/--/----</span>)</p>
+                            <p><i class="fas fa-id-card"></i> <span id="profile-cpf">000.000.000-00</span></p>
+                            <p><i class="fas fa-phone"></i> <span id="profile-telefone">(00) 00000-0000</span></p>
                         </div>
                     </div>
 
                     <div class="card emergency-card">
                         <h3><i class="fas fa-ambulance"></i> Emergência</h3>
                         <div class="contact-box">
-                            <strong>Maria Silva (Mãe)</strong>
-                            <p>(31) 97777-1111</p>
+                            <strong id="profile-contato-emergencia">Não informado</strong>
                         </div>
                     </div>
                 </aside>
@@ -89,7 +88,7 @@
     </main>
 
     <script src="../js/components.js"></script>
-    
+    <script src="../js/perfil-paciente.js"></script>
 </body>
 
 

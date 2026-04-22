@@ -16,7 +16,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
-    if (modal) modal.style.display = "block";
+    if (modal) {
+        modal.style.display = "block";
+    }
+}
+
+function abrirModalNovoPaciente() {
+    const form = document.getElementById('formNovoPaciente');
+    if (form) form.reset();
+    document.getElementById('pacienteId').value = '';
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Novo Paciente';
+    openModal('patientModal');
 }
 
 function closeModal(modalId) {
@@ -43,6 +53,10 @@ async function configurarFormulario() {
         btnSalvar.disabled = true;
         btnSalvar.textContent = 'Salvando...';
 
+        const pacienteId = document.getElementById('pacienteId').value;
+        const method = pacienteId ? 'PUT' : 'POST';
+        const url = pacienteId ? `${API_URL}/${pacienteId}` : API_URL;
+
         const payload = {
             nome_completo: document.getElementById('nome').value.trim(),
             cpf:           document.getElementById('cpf').value.trim(),
@@ -51,8 +65,8 @@ async function configurarFormulario() {
         };
 
         try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
+            const res = await fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
@@ -60,15 +74,27 @@ async function configurarFormulario() {
             const data = await res.json();
 
             if (!res.ok) {
-                alert(data.erro || 'Erro ao cadastrar paciente.');
+                alert(data.erro || 'Erro ao salvar paciente.');
                 return;
             }
 
-            // Adiciona na tabela sem recarregar a página
-            adicionarPacienteTabela(data);
-            atualizarContador(1);
+            if (pacienteId) {
+                // Atualiza a linha existente
+                const trExistente = document.querySelector(`tr[data-id="${pacienteId}"]`);
+                if (trExistente) {
+                    trExistente.remove();
+                }
+                adicionarPacienteTabela(data);
+                // Não muda o contador pois é edição
+            } else {
+                // Adiciona nova linha
+                adicionarPacienteTabela(data);
+                atualizarContador(1);
+            }
+
             closeModal('patientModal');
             form.reset();
+            document.getElementById('pacienteId').value = '';
 
         } catch (err) {
             alert('Não foi possível conectar ao servidor. Verifique se o server.js está rodando.');
@@ -257,9 +283,27 @@ function abrirProntuario(id) {
     window.location.href = `perfil-paciente.html?id=${id}`;
 }
 
-function editarPaciente(id) {
-    // TODO: abrir modal de edição com dados pré-preenchidos
-    console.log('Editar paciente ID:', id);
+async function editarPaciente(id) {
+    try {
+        const res = await fetch(`http://localhost:3000/api/pacientes/${id}`);
+        if (!res.ok) throw new Error('Falha ao buscar paciente');
+        const p = await res.json();
+
+        // Preenche o form
+        document.getElementById('pacienteId').value = p.id_paciente;
+        document.getElementById('nome').value = p.nome_completo;
+        document.getElementById('cpf').value = p.cpf;
+        document.getElementById('telefone').value = p.telefone || '';
+        document.getElementById('status').value = p.status;
+
+        // Muda título e abre
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Paciente';
+        openModal('patientModal');
+
+    } catch(err) {
+        alert('Erro ao carregar os dados do paciente.');
+        console.error(err);
+    }
 }
 
 // --- MÁSCARAS ---

@@ -19,7 +19,7 @@
                 <i class="fas fa-search"></i>
                 <input type="text" id="inputBusca" placeholder="Buscar por nome ou CPF...">
             </div>
-            <button class="btn-primary" onclick="openModal('patientModal')">
+            <button class="btn-primary" onclick="abrirModalNovoPaciente()">
                 <i class="fas fa-user-plus"></i> <span class="hide-mobile">Novo Paciente</span>
             </button>
         </header>
@@ -51,10 +51,11 @@
     <div id="patientModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3><i class="fas fa-user-plus"></i> Novo Paciente</h3>
+            <h3 id="modalTitle"><i class="fas fa-user-plus"></i> Novo Paciente</h3>
             <button class="close-btn" onclick="closeModal('patientModal')">&times;</button>
         </div>
         <form id="formNovoPaciente" class="modal-form">
+            <input type="hidden" id="pacienteId" name="pacienteId">
             <div class="form-group">
                 <label for="nome">Nome Completo</label>
                 <input type="text" id="nome" name="nome" placeholder="Ex: Ana Clara Silva" required>

@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname)));
 const dbConfig = {
     host: 'localhost',
     user: 'root',       // ← altere se necessário
-    password: '',       // ← coloque sua senha do MySQL Workbench
+    password: '123456',       // ← coloque sua senha do MySQL Workbench
     database: 'LEVEMENTE',
     waitForConnections: true,
     connectionLimit: 10,
@@ -121,6 +121,83 @@ app.post('/api/pacientes', async (req, res) => {
         }
         console.error('Erro POST /api/pacientes:', err.message);
         res.status(500).json({ erro: 'Erro ao cadastrar paciente.' });
+    }
+});
+
+/**
+ * GET /api/pacientes/:id
+ * Retorna um paciente pelo ID
+ */
+app.get('/api/pacientes/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [rows] = await pool.query(
+            `SELECT id_paciente, nome_completo, cpf,
+                    DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento,
+                    telefone, contato_emergencia, status
+             FROM pacientes WHERE id_paciente = ?`,
+            [id]
+        );
+        if (rows.length === 0) {
+            return res.status(404).json({ erro: 'Paciente não encontrado.' });
+        }
+        res.json(rows[0]);
+    } catch (err) {
+        console.error('Erro GET /api/pacientes/:id:', err.message);
+        res.status(500).json({ erro: 'Erro ao buscar paciente.' });
+    }
+});
+
+/**
+ * PUT /api/pacientes/:id
+ * Atualiza os dados de um paciente existente
+ */
+app.put('/api/pacientes/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nome_completo, cpf, telefone, status, data_nascimento, contato_emergencia } = req.body;
+
+    if (!nome_completo || !cpf) {
+        return res.status(400).json({ erro: 'nome_completo e cpf são obrigatórios.' });
+    }
+
+    try {
+        const [result] = await pool.query(
+            `UPDATE pacientes 
+             SET nome_completo = ?, cpf = ?, telefone = ?, status = ?, 
+                 data_nascimento = ?, contato_emergencia = ?
+             WHERE id_paciente = ?`,
+            [
+                nome_completo,
+                cpf,
+                telefone || null,
+                status || 'Ativo',
+                data_nascimento || null,
+                contato_emergencia || null,
+                id
+            ]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Paciente não encontrado.' });
+        }
+
+        // Retorna o paciente atualizado
+        const [rows] = await pool.query(
+            `SELECT id_paciente, nome_completo, cpf,
+                    DATE_FORMAT(data_nascimento, '%d/%m/%Y') AS data_nascimento,
+                    telefone, status,
+                    DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data_cadastro
+             FROM pacientes WHERE id_paciente = ?`,
+            [id]
+        );
+
+        res.json(rows[0]);
+    } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ erro: 'CPF já cadastrado por outro paciente.' });
+        }
+        console.error('Erro PUT /api/pacientes/:id:', err.message);
+        res.status(500).json({ erro: 'Erro ao atualizar paciente.' });
     }
 });
 
