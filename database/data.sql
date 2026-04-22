@@ -5,10 +5,17 @@ USE LEVEMENTE;
 CREATE TABLE pacientes (
     id_paciente INT AUTO_INCREMENT PRIMARY KEY,
     nome_completo VARCHAR(100) NOT NULL,
+    profissao VARCHAR(100),
     cpf VARCHAR(14) UNIQUE NOT NULL,
     data_nascimento DATE,
+    estado_civil VARCHAR(50),
+    escolaridade VARCHAR(100),
+    endereco VARCHAR(255),
     telefone VARCHAR(20),
     contato_emergencia VARCHAR(100),
+    queixa_principal TEXT,
+    historico_familiar TEXT,
+    medicacoes_em_uso TEXT,
     anamnese_texto TEXT,
     status ENUM('Ativo', 'Inativo') DEFAULT 'Ativo',
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP

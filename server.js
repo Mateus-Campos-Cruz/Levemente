@@ -132,9 +132,10 @@ app.get('/api/pacientes/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const [rows] = await pool.query(
-            `SELECT id_paciente, nome_completo, cpf,
+            `SELECT id_paciente, nome_completo, cpf, profissao,
                     DATE_FORMAT(data_nascimento, '%Y-%m-%d') AS data_nascimento,
-                    telefone, contato_emergencia, status
+                    estado_civil, escolaridade, endereco, telefone, contato_emergencia,
+                    queixa_principal, historico_familiar, medicacoes_em_uso, anamnese_texto, status
              FROM pacientes WHERE id_paciente = ?`,
             [id]
         );
@@ -154,7 +155,11 @@ app.get('/api/pacientes/:id', async (req, res) => {
  */
 app.put('/api/pacientes/:id', async (req, res) => {
     const { id } = req.params;
-    const { nome_completo, cpf, telefone, status, data_nascimento, contato_emergencia } = req.body;
+    const { 
+        nome_completo, cpf, telefone, status, data_nascimento, contato_emergencia,
+        profissao, estado_civil, escolaridade, endereco, 
+        queixa_principal, historico_familiar, medicacoes_em_uso, anamnese_texto 
+    } = req.body;
 
     if (!nome_completo || !cpf) {
         return res.status(400).json({ erro: 'nome_completo e cpf são obrigatórios.' });
@@ -164,15 +169,14 @@ app.put('/api/pacientes/:id', async (req, res) => {
         const [result] = await pool.query(
             `UPDATE pacientes 
              SET nome_completo = ?, cpf = ?, telefone = ?, status = ?, 
-                 data_nascimento = ?, contato_emergencia = ?
+                 data_nascimento = ?, contato_emergencia = ?,
+                 profissao = ?, estado_civil = ?, escolaridade = ?, endereco = ?,
+                 queixa_principal = ?, historico_familiar = ?, medicacoes_em_uso = ?, anamnese_texto = ?
              WHERE id_paciente = ?`,
             [
-                nome_completo,
-                cpf,
-                telefone || null,
-                status || 'Ativo',
-                data_nascimento || null,
-                contato_emergencia || null,
+                nome_completo, cpf, telefone || null, status || 'Ativo', data_nascimento || null, contato_emergencia || null,
+                profissao || null, estado_civil || null, escolaridade || null, endereco || null,
+                queixa_principal || null, historico_familiar || null, medicacoes_em_uso || null, anamnese_texto || null,
                 id
             ]
         );

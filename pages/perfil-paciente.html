@@ -19,8 +19,9 @@
                 <a href="pacientes.html">Pacientes</a> / <strong id="breadcrumb-nome">Carregando...</strong>
             </div>
             <div class="profile-actions">
-                <button class="btn-outline"><i class="fas fa-edit"></i> Editar</button>
-                <button class="btn-primary"><i class="fas fa-print"></i> Exportar</button>
+                <button class="btn-primary" id="btnEditarPerfil"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn-primary" id="btnEvolucoes" style="background-color: var(--pink-accent);"><i class="fas fa-clipboard-list"></i> Evoluções</button>
+                <button class="btn-secondary"><i class="fas fa-print"></i> Exportar</button>
             </div>
         </header>
 
@@ -59,10 +60,10 @@
                             <div class="info-group">
                                 <h4>Informações Gerais</h4>
                                 <div class="info-grid">
-                                    <div class="item"><span>Profissão</span><p>Designer Gráfica</p></div>
-                                    <div class="item"><span>Estado Civil</span><p>Solteira</p></div>
-                                    <div class="item"><span>Escolaridade</span><p>Superior Completo</p></div>
-                                    <div class="item"><span>Endereço</span><p>Rua das Flores, 123 - BH/MG</p></div>
+                                    <div class="item"><span>Profissão</span><p id="profile-profissao">Não informada</p></div>
+                                    <div class="item"><span>Estado Civil</span><p id="profile-estado-civil">Não informado</p></div>
+                                    <div class="item"><span>Escolaridade</span><p id="profile-escolaridade">Não informada</p></div>
+                                    <div class="item"><span>Endereço</span><p id="profile-endereco">Não informado</p></div>
                                 </div>
                             </div>
 
@@ -70,13 +71,13 @@
                                 <h4>Anamnese Inicial</h4>
                                 <div class="text-block">
                                     <h5>Queixa Principal</h5>
-                                    <p>Paciente relata episódios de ansiedade aguda relacionados ao ambiente de trabalho e dificuldade de concentração.</p>
+                                    <p id="profile-queixa">Não registrada.</p>
                                     
                                     <h5>Histórico Familiar</h5>
-                                    <p>Sem histórico de patologias mentais graves na família direta. Relacionamento estável com os pais.</p>
+                                    <p id="profile-historico">Não registrado.</p>
 
                                     <h5>Medicações em uso</h5>
-                                    <p>Nenhuma medicação psiquiátrica atual.</p>
+                                    <p id="profile-medicacoes">Não registradas.</p>
                                 </div>
                             </div>
                         </div>

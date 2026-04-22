@@ -76,8 +76,28 @@ function popularDadosNaTela(paciente) {
 
     document.getElementById('profile-idade').textContent = idadeStr;
     document.getElementById('profile-nascimento').textContent = nascStr;
-    document.getElementById('profile-cpf').textContent = paciente.cpf;
+    document.getElementById('profile-cpf').textContent = paciente.cpf || 'Não informado';
     document.getElementById('profile-telefone').textContent = paciente.telefone || 'Não informado';
     
     document.getElementById('profile-contato-emergencia').textContent = paciente.contato_emergencia || 'Não informado';
+
+    // Novos Campos Cadastrais
+    document.getElementById('profile-profissao').textContent = paciente.profissao || 'Não informada';
+    document.getElementById('profile-estado-civil').textContent = paciente.estado_civil || 'Não informado';
+    document.getElementById('profile-escolaridade').textContent = paciente.escolaridade || 'Não informada';
+    document.getElementById('profile-endereco').textContent = paciente.endereco || 'Não informado';
+
+    // Anamnese
+    document.getElementById('profile-queixa').textContent = paciente.queixa_principal || 'Não registrada.';
+    document.getElementById('profile-historico').textContent = paciente.historico_familiar || 'Não registrado.';
+    document.getElementById('profile-medicacoes').textContent = paciente.medicacoes_em_uso || 'Não registradas.';
+
+    // Botões de Ação
+    document.getElementById('btnEditarPerfil').onclick = () => {
+        window.location.href = `perfil-paciente-edit.html?id=${paciente.id_paciente}`;
+    };
+
+    document.getElementById('btnEvolucoes').onclick = () => {
+        window.location.href = `evolucao.html?id=${paciente.id_paciente}`;
+    };
 }
