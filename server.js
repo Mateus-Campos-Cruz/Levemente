@@ -350,6 +350,154 @@ app.delete('/api/evolucoes/:id', async (req, res) => {
     }
 });
 
+// ─── API: FINANCEIRO ───────────────────────────────────────
+
+/**
+ * GET /api/financeiro
+ * Retorna lançamentos financeiros, opcionalmente filtrados por mês e ano
+ * Query params: ?mes=MM&ano=YYYY
+ */
+app.get('/api/financeiro', async (req, res) => {
+    const { mes, ano } = req.query;
+    let query = `
+        SELECT f.id_lancamento, f.id_paciente, f.descricao, f.valor, f.tipo, f.status_pagamento,
+               DATE_FORMAT(f.data_vencimento, '%Y-%m-%d') AS data_vencimento,
+               p.nome_completo AS nome_paciente
+        FROM financeiro f
+        LEFT JOIN pacientes p ON f.id_paciente = p.id_paciente
+    `;
+    const queryParams = [];
+
+    if (mes && ano) {
+        query += ` WHERE MONTH(f.data_vencimento) = ? AND YEAR(f.data_vencimento) = ?`;
+        queryParams.push(mes, ano);
+    }
+    
+    query += ` ORDER BY f.data_vencimento ASC, f.id_lancamento DESC`;
+
+    try {
+        const [rows] = await pool.query(query, queryParams);
+        res.json(rows);
+    } catch (err) {
+        console.error('Erro GET /api/financeiro:', err.message);
+        res.status(500).json({ erro: 'Erro ao buscar dados financeiros.' });
+    }
+});
+
+/**
+ * GET /api/financeiro/:id
+ * Retorna um lançamento específico
+ */
+app.get('/api/financeiro/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [rows] = await pool.query(
+            `SELECT f.id_lancamento, f.id_paciente, f.descricao, f.valor, f.tipo, f.status_pagamento,
+                    DATE_FORMAT(f.data_vencimento, '%Y-%m-%d') AS data_vencimento
+             FROM financeiro f
+             WHERE f.id_lancamento = ?`,
+            [id]
+        );
+        if (rows.length === 0) {
+            return res.status(404).json({ erro: 'Lançamento não encontrado.' });
+        }
+        res.json(rows[0]);
+    } catch (err) {
+        console.error('Erro GET /api/financeiro/:id:', err.message);
+        res.status(500).json({ erro: 'Erro ao buscar lançamento.' });
+    }
+});
+
+/**
+ * POST /api/financeiro
+ * Cria um novo lançamento financeiro
+ */
+app.post('/api/financeiro', async (req, res) => {
+    const { id_paciente, descricao, valor, tipo, status_pagamento, data_vencimento } = req.body;
+
+    if (!descricao || !valor || !tipo || !data_vencimento) {
+        return res.status(400).json({ erro: 'Descrição, valor, tipo e data de vencimento são obrigatórios.' });
+    }
+
+    try {
+        const [result] = await pool.query(
+            `INSERT INTO financeiro (id_paciente, descricao, valor, tipo, status_pagamento, data_vencimento)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+                id_paciente || null, 
+                descricao, 
+                valor, 
+                tipo, 
+                status_pagamento || 'Pendente', 
+                data_vencimento
+            ]
+        );
+
+        res.status(201).json({ id_lancamento: result.insertId, mensagem: 'Lançamento criado com sucesso.' });
+    } catch (err) {
+        console.error('Erro POST /api/financeiro:', err.message);
+        res.status(500).json({ erro: 'Erro ao cadastrar lançamento financeiro.' });
+    }
+});
+
+/**
+ * PUT /api/financeiro/:id
+ * Atualiza um lançamento financeiro existente
+ */
+app.put('/api/financeiro/:id', async (req, res) => {
+    const { id } = req.params;
+    const { id_paciente, descricao, valor, tipo, status_pagamento, data_vencimento } = req.body;
+
+    if (!descricao || !valor || !tipo || !data_vencimento) {
+        return res.status(400).json({ erro: 'Descrição, valor, tipo e data de vencimento são obrigatórios.' });
+    }
+
+    try {
+        const [result] = await pool.query(
+            `UPDATE financeiro 
+             SET id_paciente = ?, descricao = ?, valor = ?, tipo = ?, status_pagamento = ?, data_vencimento = ?
+             WHERE id_lancamento = ?`,
+            [
+                id_paciente || null, 
+                descricao, 
+                valor, 
+                tipo, 
+                status_pagamento || 'Pendente', 
+                data_vencimento, 
+                id
+            ]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Lançamento não encontrado.' });
+        }
+        res.json({ mensagem: 'Lançamento atualizado com sucesso.' });
+    } catch (err) {
+        console.error('Erro PUT /api/financeiro/:id:', err.message);
+        res.status(500).json({ erro: 'Erro ao atualizar lançamento.' });
+    }
+});
+
+/**
+ * DELETE /api/financeiro/:id
+ * Remove um lançamento financeiro
+ */
+app.delete('/api/financeiro/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [result] = await pool.query(
+            'DELETE FROM financeiro WHERE id_lancamento = ?', [id]
+        );
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Lançamento não encontrado.' });
+        }
+        res.json({ mensagem: 'Lançamento removido com sucesso.' });
+    } catch (err) {
+        console.error('Erro DELETE /api/financeiro/:id:', err.message);
+        res.status(500).json({ erro: 'Erro ao remover lançamento.' });
+    }
+});
+
 // ─── Inicia o Servidor ────────────────────────────────────
 conectarBanco().then(() => {
     app.listen(PORT, () => {

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Editar Lançamento</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/pacientes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .edit-form-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--pink-border);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .section-title {
+            color: var(--pink-accent);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--pink-light);
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        .section-title:first-child { margin-top: 0; }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background-color: #f8fafc;
+            font-family: inherit;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--pink-light);
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar" id="sidebar-component"></aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="breadcrumb">
+                <a href="financeiro.html">Financeiro</a> / <strong>Editar Lançamento</strong>
+            </div>
+        </header>
+
+        <section class="content-padding">
+            <div class="page-header">
+                <h2>Ajustar Lançamento</h2>
+            </div>
+
+            <div class="edit-form-card">
+                <form id="formEditLancamento">
+                    
+                    <h3 class="section-title"><i class="fas fa-info-circle"></i> Informações Gerais</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="descricao">Descrição do Lançamento *</label>
+                            <input type="text" id="descricao" placeholder="Ex: Pagamento Mensalidade" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_paciente">Paciente Vinculado (Opcional)</label>
+                            <select id="id_paciente">
+                                <option value="">Nenhum (Despesa / Outros)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title"><i class="fas fa-dollar-sign"></i> Valores e Prazos</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="valor">Valor (R$) *</label>
+                            <input type="number" id="valor" step="0.01" placeholder="0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="data_vencimento">Data de Vencimento *</label>
+                            <input type="date" id="data_vencimento" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tipo">Categoria *</label>
+                            <select id="tipo" required>
+                                <option value="Receita">Receita</option>
+                                <option value="Despesa">Despesa</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status_pagamento">Status de Pagamento *</label>
+                            <select id="status_pagamento" required>
+                                <option value="Pago">Pago</option>
+                                <option value="Pendente">Pendente</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="window.location.href='financeiro.html'">Cancelar</button>
+                        <button type="submit" class="btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Confirmar Atualização -->
+    <div id="modalConfirmarUpdate" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-question-circle" style="color: var(--primary-color);"></i> Confirmar Atualização</h3>
+                <button class="close-btn" onclick="closeModal('modalConfirmarUpdate')">&times;</button>
+            </div>
+            <div style="padding: 25px;">
+                <p style="color: var(--text-light); font-size: 1rem; margin-bottom: 20px;">Tem certeza que deseja salvar as alterações neste lançamento?</p>
+                <div style="display: flex; justify-content: flex-end; gap: 15px;">
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalConfirmarUpdate')">Cancelar</button>
+                    <button type="button" class="btn-primary" id="btnConfirmarSave">Sim, Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso -->
+    <div id="modalSucesso" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle" style="color: #52c41a;"></i> Atualização Concluída</h3>
+                <button class="close-btn" onclick="window.location.href='financeiro.html'">&times;</button>
+            </div>
+            <div style="padding: 25px;">
+                <p style="color: var(--text-light); font-size: 1rem; margin-bottom: 20px;">As alterações no lançamento foram salvas com sucesso no banco de dados.</p>
+                <div style="display: flex; justify-content: flex-end;">
+                    <button type="button" class="btn-primary" onclick="window.location.href='financeiro.html'">Voltar ao Financeiro</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/components.js"></script>
+    <script src="../js/lancamento_edit.js"></script>
+</body>
+
+</html>

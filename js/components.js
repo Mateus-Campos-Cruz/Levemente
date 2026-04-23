@@ -33,3 +33,15 @@ document.addEventListener("DOMContentLoaded", function() {
         `;
     }
 });
+
+// Listener global para forçar letras maiúsculas em todos os campos de texto
+document.addEventListener('input', function(e) {
+    const el = e.target;
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        // Ignorar tipos que não devem ser maiúsculos
+        const ignoredTypes = ['password', 'date', 'month', 'color', 'file', 'checkbox', 'radio'];
+        if (!ignoredTypes.includes(el.type)) {
+            el.value = el.value.toUpperCase();
+        }
+    }
+});

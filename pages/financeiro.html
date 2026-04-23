@@ -28,26 +28,49 @@
         </header>
 
         <section class="content-padding">
-            <div class="page-header">
+            <div class="page-header" style="margin-bottom: 20px;">
                 <h2>Gestão Financeira</h2>
-                <span class="badge-count">Abril / 2026</span>
+            </div>
+
+            <div style="margin-bottom: 30px; display: flex;">
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; padding: 10px 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--primary-color);">
+                    <i class="fas fa-calendar-alt" style="color: var(--primary-color);"></i>
+                    <label for="filtroMes" style="font-weight: 600; color: var(--text-light); font-size: 0.95rem;">Período:</label>
+                    <input type="month" id="filtroMes" style="border: 1px solid var(--primary-color); border-radius: 6px; padding: 6px 12px; outline-color: var(--primary-color); color: var(--text-dark); font-family: inherit; font-size: 0.95rem; cursor: pointer; background: #fff;">
+                </div>
             </div>
 
             <div class="stats-grid">
-                <div class="stat-card income">
+                <div class="stat-card income" style="background-color: #fff; border-left: 4px solid #1890ff;">
                     <div class="stat-info">
-                        <span>Receita Mensal (Pago)</span>
-                        <h3 id="receita-total">R$ 150,00</h3>
+                        <span style="color: var(--text-light);">Receita Mensal (Paga)</span>
+                        <h3 id="receita-paga" style="color: var(--text-dark);">R$ 0,00</h3>
                     </div>
-                    <i class="fas fa-arrow-up icon-bg"></i>
+                    <i class="fas fa-arrow-up icon-bg" style="color: rgba(24, 144, 255, 0.1);"></i>
                 </div>
 
-                <div class="stat-card pending">
+                <div class="stat-card pending" style="background-color: #fff; border-left: 4px solid #faad14;">
                     <div class="stat-info">
-                        <span>A Receber (Pendente)</span>
-                        <h3 id="pendente-total">R$ 0,00</h3>
+                        <span style="color: var(--text-light);">A Receber (Pendente)</span>
+                        <h3 id="receita-pendente" style="color: var(--text-dark);">R$ 0,00</h3>
                     </div>
-                    <i class="fas fa-clock icon-bg"></i>
+                    <i class="fas fa-clock icon-bg" style="color: rgba(250, 173, 20, 0.1);"></i>
+                </div>
+
+                <div class="stat-card expense" style="background-color: #fff; border-left: 4px solid #f5222d;">
+                    <div class="stat-info">
+                        <span style="color: var(--text-light);">Despesa Mensal (Paga)</span>
+                        <h3 id="despesa-paga" style="color: var(--text-dark);">R$ 0,00</h3>
+                    </div>
+                    <i class="fas fa-arrow-down icon-bg" style="color: rgba(245, 34, 45, 0.1);"></i>
+                </div>
+
+                <div class="stat-card expense-pending" style="background-color: #fff; border-left: 4px solid #faad14;">
+                    <div class="stat-info">
+                        <span style="color: var(--text-light);">Despesa Mensal (A Pagar)</span>
+                        <h3 id="despesa-pendente" style="color: var(--text-dark);">R$ 0,00</h3>
+                    </div>
+                    <i class="fas fa-exclamation-circle icon-bg" style="color: rgba(250, 173, 20, 0.1);"></i>
                 </div>
             </div>
 
@@ -59,6 +82,7 @@
                             <th>Paciente</th>
                             <th class="hide-tablet">Valor</th>
                             <th class="hide-tablet">Vencimento</th>
+                            <th>Tipo</th>
                             <th>Status</th>
                             <th>Ações</th>
                         </tr>
@@ -78,6 +102,12 @@
             </div>
             <form id="formFinanceiro" class="modal-form">
                 <div class="form-group">
+                    <label for="id_paciente">Paciente (Opcional)</label>
+                    <select id="id_paciente" class="form-select">
+                        <option value="">Nenhum (Despesa Fixa / Outro)</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="descricao">Descrição</label>
                     <input type="text" id="descricao" placeholder="Ex: Sessão Semanal" required>
                 </div>
@@ -88,8 +118,22 @@
                         <input type="number" id="valor" step="0.01" placeholder="150.00" required>
                     </div>
                     <div class="form-group">
-                        <label for="statusLancamento">Status</label>
-                        <select id="statusLancamento" class="form-select">
+                        <label for="data_vencimento">Data de Vencimento</label>
+                        <input type="date" id="data_vencimento" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select id="tipo" class="form-select">
+                            <option value="Receita">Receita</option>
+                            <option value="Despesa">Despesa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status_pagamento">Status</label>
+                        <select id="status_pagamento" class="form-select">
                             <option value="Pago">Pago</option>
                             <option value="Pendente">Pendente</option>
                         </select>
@@ -102,6 +146,23 @@
                     <button type="submit" class="btn-primary">Salvar</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Exclusão -->
+    <div id="modalExcluir" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle" style="color: #db2777;"></i> Excluir Lançamento</h3>
+                <button class="close-btn" onclick="closeModal('modalExcluir')">&times;</button>
+            </div>
+            <div style="padding: 20px 25px 25px 25px;">
+                <p style="color: var(--text-light); font-size: 1rem; line-height: 1.5; margin-bottom: 20px;">Tem certeza que deseja excluir este lançamento? Esta ação não pode ser desfeita.</p>
+                <div style="display: flex; justify-content: flex-end; gap: 15px;">
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalExcluir')">Cancelar</button>
+                    <button type="button" class="btn-primary" id="btnConfirmarExclusao">Confirmar Exclusão</button>
+                </div>
+            </div>
         </div>
     </div>
 
