@@ -20,8 +20,6 @@ async function carregarDadosPaciente() {
         return;
     }
 
-    // Configura o link de voltar
-    document.getElementById('link-voltar-perfil').href = `perfil-paciente.html?id=${pacienteId}`;
     document.getElementById('btnCancelar').onclick = () => {
         window.location.href = `perfil-paciente.html?id=${pacienteId}`;
     };
@@ -30,6 +28,13 @@ async function carregarDadosPaciente() {
         const res = await fetch(`http://localhost:3000/api/pacientes/${pacienteId}`);
         if (!res.ok) throw new Error('Erro ao buscar paciente');
         const p = await res.json();
+
+        // Configura o link de voltar com o nome real
+        const linkVoltar = document.getElementById('link-voltar-perfil');
+        if (linkVoltar) {
+            linkVoltar.textContent = p.nome_completo;
+            linkVoltar.href = `perfil-paciente.html?id=${pacienteId}`;
+        }
 
         // Preenche os campos
         document.getElementById('nome_completo').value = p.nome_completo || '';

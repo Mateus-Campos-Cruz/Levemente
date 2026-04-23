@@ -225,6 +225,131 @@ app.delete('/api/pacientes/:id', async (req, res) => {
     }
 });
 
+// ─── API: EVOLUÇÕES ───────────────────────────────────────
+
+/**
+ * GET /api/evolucoes/paciente/:id_paciente
+ * Lista evoluções de um paciente específico
+ */
+app.get('/api/evolucoes/paciente/:id_paciente', async (req, res) => {
+    const { id_paciente } = req.params;
+    try {
+        const [rows] = await pool.query(
+            `SELECT id_evolucao, id_paciente, 
+                    DATE_FORMAT(data_sessao, '%Y-%m-%d') AS data_sessao, 
+                    texto_evolucao, tipo_sessao, tags
+             FROM evolucoes 
+             WHERE id_paciente = ? 
+             ORDER BY data_sessao DESC, id_evolucao DESC`,
+            [id_paciente]
+        );
+        res.json(rows);
+    } catch (err) {
+        console.error('Erro GET /api/evolucoes/paciente/:id_paciente:', err.message);
+        res.status(500).json({ erro: 'Erro ao buscar evoluções do paciente.' });
+    }
+});
+
+/**
+ * GET /api/evolucoes/:id
+ * Retorna uma evolução específica
+ */
+app.get('/api/evolucoes/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [rows] = await pool.query(
+            `SELECT id_evolucao, id_paciente, 
+                    DATE_FORMAT(data_sessao, '%Y-%m-%d') AS data_sessao, 
+                    texto_evolucao, tipo_sessao, tags
+             FROM evolucoes 
+             WHERE id_evolucao = ?`,
+            [id]
+        );
+        if (rows.length === 0) {
+            return res.status(404).json({ erro: 'Evolução não encontrada.' });
+        }
+        res.json(rows[0]);
+    } catch (err) {
+        console.error('Erro GET /api/evolucoes/:id:', err.message);
+        res.status(500).json({ erro: 'Erro ao buscar evolução.' });
+    }
+});
+
+/**
+ * POST /api/evolucoes
+ * Cria uma nova evolução
+ */
+app.post('/api/evolucoes', async (req, res) => {
+    const { id_paciente, data_sessao, texto_evolucao, tipo_sessao, tags } = req.body;
+
+    if (!id_paciente || !data_sessao || !texto_evolucao) {
+        return res.status(400).json({ erro: 'id_paciente, data_sessao e texto_evolucao são obrigatórios.' });
+    }
+
+    try {
+        const [result] = await pool.query(
+            `INSERT INTO evolucoes (id_paciente, data_sessao, texto_evolucao, tipo_sessao, tags)
+             VALUES (?, ?, ?, ?, ?)`,
+            [id_paciente, data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null]
+        );
+
+        res.status(201).json({ id_evolucao: result.insertId, mensagem: 'Evolução criada com sucesso.' });
+    } catch (err) {
+        console.error('Erro POST /api/evolucoes:', err.message);
+        res.status(500).json({ erro: 'Erro ao cadastrar evolução.' });
+    }
+});
+
+/**
+ * PUT /api/evolucoes/:id
+ * Atualiza uma evolução existente
+ */
+app.put('/api/evolucoes/:id', async (req, res) => {
+    const { id } = req.params;
+    const { data_sessao, texto_evolucao, tipo_sessao, tags } = req.body;
+
+    if (!data_sessao || !texto_evolucao) {
+        return res.status(400).json({ erro: 'data_sessao e texto_evolucao são obrigatórios.' });
+    }
+
+    try {
+        const [result] = await pool.query(
+            `UPDATE evolucoes 
+             SET data_sessao = ?, texto_evolucao = ?, tipo_sessao = ?, tags = ?
+             WHERE id_evolucao = ?`,
+            [data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Evolução não encontrada.' });
+        }
+        res.json({ mensagem: 'Evolução atualizada com sucesso.' });
+    } catch (err) {
+        console.error('Erro PUT /api/evolucoes/:id:', err.message);
+        res.status(500).json({ erro: 'Erro ao atualizar evolução.' });
+    }
+});
+
+/**
+ * DELETE /api/evolucoes/:id
+ * Remove uma evolução
+ */
+app.delete('/api/evolucoes/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [result] = await pool.query(
+            'DELETE FROM evolucoes WHERE id_evolucao = ?', [id]
+        );
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Evolução não encontrada.' });
+        }
+        res.json({ mensagem: 'Evolução removida com sucesso.' });
+    } catch (err) {
+        console.error('Erro DELETE /api/evolucoes/:id:', err.message);
+        res.status(500).json({ erro: 'Erro ao remover evolução.' });
+    }
+});
+
 // ─── Inicia o Servidor ────────────────────────────────────
 conectarBanco().then(() => {
     app.listen(PORT, () => {

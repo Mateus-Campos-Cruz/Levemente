@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Editar Evolução</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/pacientes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .edit-form-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--pink-border);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background-color: #f8fafc;
+            font-family: inherit;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 200px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--pink-light);
+        }
+        .patient-banner {
+            background: #fdf2f8;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 4px solid var(--pink-accent);
+        }
+        .patient-banner h4 {
+            color: var(--pink-accent);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar-component"></aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="breadcrumb">
+                <a href="pacientes.html">Pacientes</a> / <a href="#" id="link-evolucao-paciente">Carregando...</a> / <strong>Editar Evolução</strong>
+            </div>
+        </header>
+
+        <section class="content-padding">
+            <div class="page-header">
+                <h2>Editar Evolução</h2>
+            </div>
+
+            <div class="edit-form-card">
+                <div class="patient-banner">
+                    <i class="fas fa-user-circle" style="font-size: 2rem; color: var(--pink-accent);"></i>
+                    <div>
+                        <h4 id="banner-nome">Paciente...</h4>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);" id="banner-cpf">CPF: ...</span>
+                    </div>
+                </div>
+
+                <form id="formEditarEvolucao">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="data_sessao">Data da Sessão *</label>
+                            <input type="date" id="data_sessao" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo_sessao">Tipo de Sessão</label>
+                            <select id="tipo_sessao">
+                                <option value="Presencial">Presencial</option>
+                                <option value="Online">Online</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tags">Tags / Temas (Opcional)</label>
+                            <input type="text" id="tags" placeholder="Ex: Ansiedade, Luto, Família">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="texto_evolucao">Anotações da Sessão *</label>
+                        <textarea id="texto_evolucao" required placeholder="Escreva os detalhes, progresso, falas importantes ou observações técnicas..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="btnCancelar">Cancelar</button>
+                        <button type="submit" class="btn-primary" id="btnSalvar">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/components.js"></script>
+    <script src="../js/editar-evolucao.js"></script>
+</body>
+</html>
