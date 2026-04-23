@@ -50,11 +50,12 @@ async function carregarCabecalho() {
 }
 
 function configurarFormulario() {
+
     const form = document.getElementById('formNovaEvolucao');
-    
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const btnSalvar = document.getElementById('btnSalvar');
         btnSalvar.disabled = true;
         btnSalvar.textContent = 'Salvando...';
