@@ -15,14 +15,15 @@
 
     <main class="main-content">
         <header class="top-bar">
-            <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
-            <div class="breadcrumb">
-                <a href="pacientes.html">Pacientes</a> / <strong id="breadcrumb-nome">Carregando...</strong>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button id="menu-toggle" class="menu-btn"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb" style="margin: 0;">
+                    <a href="pacientes.html">Pacientes</a> / <strong id="breadcrumb-nome">Carregando...</strong>
+                </div>
             </div>
-            <div class="profile-actions">
+            <div class="profile-actions" style="display: flex; gap: 10px;">
                 <button class="btn-secondary" id="btnEditarPerfil"><i class="fas fa-edit"></i> Editar</button>
                 <button class="btn-primary" id="btnEvolucoes"><i class="fas fa-clipboard-list"></i> Evoluções</button>
-                <button class="btn-secondary"><i class="fas fa-print"></i> Exportar</button>
             </div>
         </header>
 
@@ -34,7 +35,6 @@
                         <div class="avatar-large" id="profile-iniciais">--</div>
                         <h2 id="profile-nome">Carregando...</h2>
                         <span class="status-tag" id="profile-status">...</span>
-                        <hr>
                         <div class="quick-info">
                             <p><i class="fas fa-birthday-cake"></i> <span id="profile-idade">-- anos</span> (<span id="profile-nascimento">--/--/----</span>)</p>
                             <p><i class="fas fa-id-card"></i> <span id="profile-cpf">000.000.000-00</span></p>
@@ -53,11 +53,11 @@
                 <article class="profile-main">
                     <div class="card">
                         <div class="tabs-internal">
-                            <button class="tab-link active">Dados Cadastrais</button>
-                            <button class="tab-link">Anamnese Inicial</button>
+                            <button class="tab-link active" id="tab-cadastrais" onclick="switchTab('cadastrais')">Dados Cadastrais</button>
+                            <button class="tab-link" id="tab-anamnese" onclick="switchTab('anamnese')">Anamnese Inicial</button>
                         </div>
 
-                        <div class="tab-content">
+                        <div class="tab-content" id="content-cadastrais">
                             <div class="info-group">
                                 <h4>Informações Gerais</h4>
                                 <div class="info-grid">
@@ -67,7 +67,9 @@
                                     <div class="item"><span>Endereço</span><p id="profile-endereco">Não informado</p></div>
                                 </div>
                             </div>
+                        </div>
 
+                        <div class="tab-content" id="content-anamnese" style="display: none;">
                             <div class="info-group">
                                 <h4>Anamnese Inicial</h4>
                                 <div class="text-block">
@@ -79,6 +81,14 @@
 
                                     <h5>Medicações em uso</h5>
                                     <p id="profile-medicacoes">Não registradas.</p>
+                                    
+                                    <h5>Anotação Detalhada (Anamnese)</h5>
+                                    <p id="profile-anamnese-texto">Não registrada.</p>
+
+                                    <div id="anamnese-empty-action" style="display: none; margin-top: 20px; background: var(--pink-light); padding: 15px; border-radius: 12px; border: 1px dashed var(--pink-accent); text-align: center;">
+                                        <p style="color: var(--pink-accent); font-size: 0.95rem; margin-bottom: 10px; font-weight: bold;"><i class="fas fa-info-circle"></i> O texto da anamnese inicial ainda não foi preenchido.</p>
+                                        <button class="btn-primary" onclick="irParaEdicao()"><i class="fas fa-edit"></i> Preencher Anamnese</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

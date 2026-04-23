@@ -91,6 +91,17 @@ function popularDadosNaTela(paciente) {
     document.getElementById('profile-queixa').textContent = paciente.queixa_principal || 'Não registrada.';
     document.getElementById('profile-historico').textContent = paciente.historico_familiar || 'Não registrado.';
     document.getElementById('profile-medicacoes').textContent = paciente.medicacoes_em_uso || 'Não registradas.';
+    
+    const textoAnamnese = document.getElementById('profile-anamnese-texto');
+    const emptyAction = document.getElementById('anamnese-empty-action');
+    
+    if (paciente.anamnese_texto && paciente.anamnese_texto.trim() !== '') {
+        textoAnamnese.textContent = paciente.anamnese_texto;
+        emptyAction.style.display = 'none';
+    } else {
+        textoAnamnese.textContent = '';
+        emptyAction.style.display = 'block';
+    }
 
     // Botões de Ação
     document.getElementById('btnEditarPerfil').onclick = () => {
@@ -100,4 +111,31 @@ function popularDadosNaTela(paciente) {
     document.getElementById('btnEvolucoes').onclick = () => {
         window.location.href = `evolucao.html?id=${paciente.id_paciente}`;
     };
+}
+
+function switchTab(tab) {
+    const btnCadastrais = document.getElementById('tab-cadastrais');
+    const btnAnamnese = document.getElementById('tab-anamnese');
+    const contentCadastrais = document.getElementById('content-cadastrais');
+    const contentAnamnese = document.getElementById('content-anamnese');
+
+    if (tab === 'cadastrais') {
+        btnCadastrais.classList.add('active');
+        btnAnamnese.classList.remove('active');
+        contentCadastrais.style.display = 'block';
+        contentAnamnese.style.display = 'none';
+    } else {
+        btnAnamnese.classList.add('active');
+        btnCadastrais.classList.remove('active');
+        contentAnamnese.style.display = 'block';
+        contentCadastrais.style.display = 'none';
+    }
+}
+
+function irParaEdicao() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (id) {
+        window.location.href = `perfil-paciente-edit.html?id=${id}`;
+    }
 }
