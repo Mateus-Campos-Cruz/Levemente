@@ -78,6 +78,7 @@ function popularDadosNaTela(paciente) {
     document.getElementById('profile-nascimento').textContent = nascStr;
     document.getElementById('profile-cpf').textContent = paciente.cpf || 'Não informado';
     document.getElementById('profile-telefone').textContent = paciente.telefone || 'Não informado';
+    document.getElementById('profile-email').textContent = paciente.email || 'Não informado';
     
     document.getElementById('profile-contato-emergencia').textContent = paciente.contato_emergencia || 'Não informado';
 

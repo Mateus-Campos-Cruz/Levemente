@@ -63,6 +63,38 @@
             </div>
         </section>
     </main>
-     <script src="../js/components.js"></script>
+    <div id="eventModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-plus"></i> Novo Agendamento</h3>
+                <button class="close-btn" onclick="closeModal('eventModal')">&times;</button>
+            </div>
+            <form id="formNovaSessao" class="modal-form">
+                <div class="form-group">
+                    <label for="paciente_id">Paciente</label>
+                    <select id="paciente_id" name="paciente_id" required>
+                        <option value="">Selecione o paciente...</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="data_sessao">Data</label>
+                        <input type="date" id="data_sessao" name="data_sessao" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hora_sessao">Hora</label>
+                        <input type="time" id="hora_sessao" name="hora_sessao" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('eventModal')">Cancelar</button>
+                    <button type="submit" class="btn-primary">Confirmar Agendamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/components.js"></script>
+    <script src="../js/agenda.js"></script>
 </body>
 </html>

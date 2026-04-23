@@ -59,6 +59,7 @@ async function configurarFormulario() {
 
         const payload = {
             nome_completo: document.getElementById('nome').value.trim(),
+            email:         document.getElementById('email').value.trim(),
             cpf:           document.getElementById('cpf').value.trim(),
             telefone:      document.getElementById('telefone').value.trim(),
             status:        document.getElementById('status').value,
@@ -292,6 +293,7 @@ async function editarPaciente(id) {
         // Preenche o form
         document.getElementById('pacienteId').value = p.id_paciente;
         document.getElementById('nome').value = p.nome_completo;
+        document.getElementById('email').value = p.email || '';
         document.getElementById('cpf').value = p.cpf;
         document.getElementById('telefone').value = p.telefone || '';
         document.getElementById('status').value = p.status;

@@ -26,14 +26,14 @@
                     <i class="fas fa-user-check"></i>
                     <div class="metric-info">
                         <h3>Pacientes Ativos</h3>
-                        <p>24</p>
+                        <p id="total-pacientes-ativos">0</p>
                     </div>
                 </div>
                 <div class="metric-card">
                     <i class="fas fa-calendar-day"></i>
                     <div class="metric-info">
                         <h3>Sessões Hoje</h3>
-                        <p>6</p>
+                        <p id="total-sessoes-hoje">0</p>
                     </div>
                 </div>
                 <div class="metric-card accent">
@@ -51,22 +51,9 @@
                         <h3>Sessões Pendentes (Hoje)</h3>
                         <a href="#" class="view-all">Ver Agenda</a>
                     </div>
-                    <ul class="session-list">
-                        <li class="session-item">
-                            <div class="session-time">09:00</div>
-                            <div class="session-details">
-                                <strong>Ana Clara Silva</strong>
-                                <span>Psicoterapia Individual</span>
-                            </div>
-                            <button class="btn-action">Iniciar</button>
-                        </li>
-                        <li class="session-item">
-                            <div class="session-time">10:30</div>
-                            <div class="session-details">
-                                <strong>Ricardo Oliveira</strong>
-                                <span>Primeira Consulta</span>
-                            </div>
-                            <button class="btn-action">Iniciar</button>
+                    <ul class="session-list" id="lista-sessoes-pendentes">
+                        <li class="session-item" style="justify-content: center; color: #64748b; padding: 20px;">
+                            Carregando sessões...
                         </li>
                     </ul>
                 </div>

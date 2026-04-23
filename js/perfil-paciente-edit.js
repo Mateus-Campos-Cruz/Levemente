@@ -38,6 +38,7 @@ async function carregarDadosPaciente() {
 
         // Preenche os campos
         document.getElementById('nome_completo').value = p.nome_completo || '';
+        document.getElementById('email').value = p.email || '';
         document.getElementById('cpf').value = p.cpf || '';
         document.getElementById('data_nascimento').value = p.data_nascimento || ''; // Já vem YYYY-MM-DD da API
         document.getElementById('estado_civil').value = p.estado_civil || '';
@@ -71,6 +72,7 @@ function configurarFormularioEdit() {
 
         const payload = {
             nome_completo: document.getElementById('nome_completo').value.trim(),
+            email: document.getElementById('email').value.trim(),
             cpf: document.getElementById('cpf').value.trim(),
             data_nascimento: document.getElementById('data_nascimento').value || null,
             estado_civil: document.getElementById('estado_civil').value,
