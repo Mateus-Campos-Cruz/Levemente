@@ -7,9 +7,27 @@ const API_DASH_STATS = 'http://localhost:3000/api/dashboard/stats';
 const API_AGENDA = 'http://localhost:3000/api/agenda';
 
 document.addEventListener("DOMContentLoaded", () => {
+    carregarUsuario();
     carregarEstatisticas();
     carregarSessoesPendentes();
 });
+
+/**
+ * Carrega dados do usuário logado do localStorage
+ */
+function carregarUsuario() {
+    const usuarioJson = localStorage.getItem('usuario');
+    if (usuarioJson) {
+        const usuario = JSON.parse(usuarioJson);
+        const elNome = document.getElementById('user-name-display');
+        const elAvatar = document.getElementById('user-avatar-display');
+
+        if (elNome) elNome.textContent = usuario.nome || 'Usuário';
+        if (elAvatar && usuario.nome) {
+            elAvatar.textContent = usuario.nome.charAt(0).toUpperCase();
+        }
+    }
+}
 
 /**
  * Busca estatísticas gerais (Ativos, Sessões Hoje, Faturamento)

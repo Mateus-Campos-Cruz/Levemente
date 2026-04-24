@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEVEMENTE | Autenticação</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
     <main class="auth-container">
@@ -37,6 +39,7 @@
                     <div class="input-field">
                         <i class="fas fa-lock"></i>
                         <input type="password" id="password" placeholder="••••••••" required>
+                        <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
                     </div>
                 </div>
 
@@ -63,7 +66,7 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="reg-crp">Registro Profissional (CRP/CRM)</label>
+                    <label for="reg-crp">Registro Profissional (CRP)</label>
                     <div class="input-field">
                         <i class="fas fa-id-card"></i>
                         <input type="text" id="reg-crp" placeholder="00/00000" required>
@@ -74,8 +77,26 @@
                     <label for="reg-password">Senha</label>
                     <div class="input-field">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required>
+                        <i class="fas fa-eye toggle-password" onclick="togglePassword('reg-password')"></i>
                     </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="reg-password-confirm">Confirmar Senha</label>
+                    <div class="input-field">
+                        <i class="fas fa-check-double"></i>
+                        <input type="password" id="reg-password-confirm" placeholder="Repita sua senha" required>
+                        <i class="fas fa-eye toggle-password" onclick="togglePassword('reg-password-confirm')"></i>
+                    </div>
+                </div>
+
+                <div class="password-criteria" id="password-criteria">
+                    <p id="crit-length" class="invalid"><i class="fas fa-circle"></i> Mínimo 6 caracteres</p>
+                    <p id="crit-upper" class="invalid"><i class="fas fa-circle"></i> Uma letra maiúscula</p>
+                    <p id="crit-number" class="invalid"><i class="fas fa-circle"></i> Um número</p>
+                    <p id="crit-special" class="invalid"><i class="fas fa-circle"></i> Um caractere especial</p>
+                    <p id="crit-match" class="invalid"><i class="fas fa-circle"></i> Senhas coincidem</p>
                 </div>
 
                 <div class="lgpd-consent">
@@ -92,4 +113,5 @@
 
     <script src="../js/auth.js"></script>
 </body>
+
 </html>

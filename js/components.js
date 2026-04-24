@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <div class="sidebar-logo">
                 <h1 style="color: #db2777; padding: 20px; font-size: 1.5rem;">LEVEMENTE</h1>
             </div>
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" style="flex: 1;">
                 <a href="dashboard.html" class="${isActive('dashboard.html')}">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
@@ -53,16 +53,18 @@ document.addEventListener("DOMContentLoaded", function() {
                 <a href="configuracoes.html" class="${isActive('configuracoes.html')}">
                     <i class="fas fa-cog"></i> Configurações
                 </a>
-                <a href="#" id="btn-logout" style="color: #64748b; margin-top: auto;">
-                    <i class="fas fa-sign-out-alt"></i> Sair
+                <a href="#" id="btn-logout" style="margin-top: auto; color: #ef4444;">
+                    <i class="fas fa-sign-out-alt"></i> Sair da Conta
                 </a>
             </nav>
         `;
 
         document.getElementById('btn-logout').addEventListener('click', (e) => {
             e.preventDefault();
-            localStorage.removeItem('usuario');
-            window.location.href = '/';
+            if (confirm('Deseja realmente sair da plataforma?')) {
+                localStorage.removeItem('usuario');
+                window.location.href = '/';
+            }
         });
     }
 });

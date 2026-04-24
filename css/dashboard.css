@@ -51,6 +51,7 @@ body {
 
 .sidebar-nav {
     display: flex;
+    flex: 1;
     flex-direction: column;
     padding: 10px;
     gap: 5px;
