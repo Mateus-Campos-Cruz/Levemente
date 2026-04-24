@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Mateus-Campos-Cruz/Levemente#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "mysql2": "^3.22.2"

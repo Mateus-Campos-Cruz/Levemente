@@ -73,7 +73,7 @@ function configurarBusca() {
 
 async function carregarPacientes() {
     try {
-        const res = await fetch(API_PACIENTES);
+        const res = await fetch(API_PACIENTES, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Erro ao buscar pacientes');
         const pacientes = await res.json();
         
@@ -97,7 +97,7 @@ async function carregarLancamentos(mes, ano) {
         if (mes && ano) {
             url += `?mes=${mes}&ano=${ano}`;
         }
-        const res = await fetch(url);
+        const res = await fetch(url, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Erro ao buscar lançamentos');
         const lancamentos = await res.json();
         
@@ -169,7 +169,7 @@ function configurarFormFinanceiro() {
         try {
             const res = await fetch(API_FINANCEIRO, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(payload)
             });
 
@@ -265,7 +265,10 @@ async function confirmarExclusao() {
     if (!idLancamentoExcluir) return;
 
     try {
-        const res = await fetch(`${API_FINANCEIRO}/${idLancamentoExcluir}`, { method: 'DELETE' });
+        const res = await fetch(`${API_FINANCEIRO}/${idLancamentoExcluir}`, { 
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
         if (!res.ok) throw new Error('Erro ao excluir lançamento');
 
         closeModal('modalExcluir');

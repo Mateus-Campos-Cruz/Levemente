@@ -22,7 +22,7 @@ async function carregarEvolucao() {
 
     try {
         // Busca a evolução
-        const resEv = await fetch(`http://localhost:3000/api/evolucoes/${evolucaoId}`);
+        const resEv = await fetch(`http://localhost:3000/api/evolucoes/${evolucaoId}`, { headers: getAuthHeaders() });
         if (!resEv.ok) throw new Error('Erro ao buscar evolução');
         const ev = await resEv.json();
 
@@ -40,7 +40,7 @@ async function carregarEvolucao() {
         };
 
         // Agora busca o paciente para preencher o banner
-        const resPac = await fetch(`http://localhost:3000/api/pacientes/${pacienteId}`);
+        const resPac = await fetch(`http://localhost:3000/api/pacientes/${pacienteId}`, { headers: getAuthHeaders() });
         if (resPac.ok) {
             const p = await resPac.json();
             
@@ -82,7 +82,7 @@ function configurarFormulario() {
         try {
             const res = await fetch(`http://localhost:3000/api/evolucoes/${evolucaoId}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(payload)
             });
 

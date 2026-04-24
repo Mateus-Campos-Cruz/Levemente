@@ -32,7 +32,7 @@ async function carregarPacientesNoSelect() {
     if (!select) return;
 
     try {
-        const res = await fetch(API_PACIENTES);
+        const res = await fetch(API_PACIENTES, { headers: getAuthHeaders() });
         const pacientes = await res.json();
         
         pacientes.forEach(p => {
@@ -69,7 +69,7 @@ function configurarFormularioAgenda() {
         try {
             const res = await fetch(API_AGENDA, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(payload)
             });
 

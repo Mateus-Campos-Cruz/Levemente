@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEVEMENTE | Login</title>
+    <title>LEVEMENTE | Autenticação</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -17,16 +18,17 @@
 
         <section class="auth-card">
             <div class="tabs">
-                <button class="tab-btn active" onclick="toggleAuth('login')">Entrar</button>
-                <button class="tab-btn" onclick="toggleAuth('register')">Cadastrar</button>
+                <button class="tab-btn active" id="tab-login" onclick="toggleAuth('login')">Entrar</button>
+                <button class="tab-btn" id="tab-register" onclick="toggleAuth('register')">Cadastrar</button>
             </div>
 
+            <!-- Formulário de Login -->
             <form id="login-form" class="auth-form">
                 <div class="input-group">
                     <label for="email">E-mail Profissional</label>
                     <div class="input-field">
                         <i class="fas fa-envelope"></i>
-                        <input type="email" id="email" placeholder="exemplo@crp.com.br" required>
+                        <input type="email" id="email" placeholder="exemplo@email.com" required>
                     </div>
                 </div>
 
@@ -42,26 +44,44 @@
                 <a href="#" class="forgot-password">Esqueceu sua senha?</a>
             </form>
 
+            <!-- Formulário de Cadastro -->
             <form id="register-form" class="auth-form hidden">
                 <div class="input-group">
                     <label for="reg-nome">Nome Completo</label>
-                    <input type="text" id="reg-nome" placeholder="Seu nome" required>
+                    <div class="input-field">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="reg-nome" placeholder="Seu nome completo" required>
+                    </div>
                 </div>
 
                 <div class="input-group">
-                    <label for="reg-crp">CRP (Registro Profissional)</label>
-                    <input type="text" id="reg-crp" placeholder="00/00000" required>
+                    <label for="reg-email">E-mail Profissional</label>
+                    <div class="input-field">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="reg-email" placeholder="seu@email.com" required>
+                    </div>
                 </div>
 
                 <div class="input-group">
-                    <label for="reg-email">E-mail</label>
-                    <input type="email" id="reg-email" placeholder="seu@email.com" required>
+                    <label for="reg-crp">Registro Profissional (CRP/CRM)</label>
+                    <div class="input-field">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="reg-crp" placeholder="00/00000" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="reg-password">Senha</label>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
                 </div>
 
                 <div class="lgpd-consent">
                     <input type="checkbox" id="terms" required>
                     <label for="terms">
-                        Li e aceito a <a href="#">Política de Privacidade</a> e o tratamento de dados conforme a LGPD.
+                        Li e aceito a <a href="#">Política de Privacidade</a>.
                     </label>
                 </div>
 
@@ -70,24 +90,6 @@
         </section>
     </main>
 
-    <script>
-        function toggleAuth(type) {
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            const btns = document.querySelectorAll('.tab-btn');
-
-            if (type === 'login') {
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-                btns[0].classList.add('active');
-                btns[1].classList.remove('active');
-            } else {
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
-                btns[1].classList.add('active');
-                btns[0].classList.remove('active');
-            }
-        }
-    </script>
+    <script src="../js/auth.js"></script>
 </body>
 </html>

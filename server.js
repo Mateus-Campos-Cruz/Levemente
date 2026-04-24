@@ -7,12 +7,15 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = 3000;
 
-// ID do usuário mestre para filtragem (Simulando usuário logado)
-const USER_ID_FIXO = 1;
+// Helper para obter o ID do usuário das requisições
+const getUserId = (req) => {
+    return req.headers['x-user-id'] || null;
+};
 
 // ─── Middlewares ──────────────────────────────────────────
 app.use(cors());
@@ -53,6 +56,67 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'index.html'));
 });
 
+// ─── API: AUTENTICAÇÃO ────────────────────────────────────
+
+/**
+ * POST /api/auth/register
+ * Cadastro de novo usuário mestre
+ */
+app.post('/api/auth/register', async (req, res) => {
+    const { nome, email, senha, registro_profissional } = req.body;
+
+    if (!nome || !email || !senha) {
+        return res.status(400).json({ erro: 'Nome, email e senha são obrigatórios.' });
+    }
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const senhaHash = await bcrypt.hash(senha, salt);
+
+        const [result] = await pool.query(
+            `INSERT INTO usuario_mestre (nome, email, senha_hash, registro_profissional)
+             VALUES (?, ?, ?, ?)`,
+            [nome, email, senhaHash, registro_profissional || null]
+        );
+
+        res.status(201).json({ id: result.insertId, nome, mensagem: 'Usuário cadastrado com sucesso.' });
+    } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ erro: 'E-mail já cadastrado.' });
+        }
+        console.error('Erro no registro:', err);
+        res.status(500).json({ erro: 'Erro ao cadastrar usuário.' });
+    }
+});
+
+/**
+ * POST /api/auth/login
+ * Login simplificado
+ */
+app.post('/api/auth/login', async (req, res) => {
+    const { email, senha } = req.body;
+
+    try {
+        const [rows] = await pool.query('SELECT * FROM usuario_mestre WHERE email = ?', [email]);
+        
+        if (rows.length === 0) {
+            return res.status(401).json({ erro: 'E-mail ou senha incorretos.' });
+        }
+
+        const usuario = rows[0];
+        const senhaValida = await bcrypt.compare(senha, usuario.senha_hash);
+
+        if (!senhaValida) {
+            return res.status(401).json({ erro: 'E-mail ou senha incorretos.' });
+        }
+
+        res.json({ id: usuario.id_usuario_mestre, nome: usuario.nome });
+    } catch (err) {
+        console.error('Erro no login:', err);
+        res.status(500).json({ erro: 'Erro ao realizar login.' });
+    }
+});
+
 // ─── API: PACIENTES ───────────────────────────────────────
 
 /**
@@ -74,7 +138,7 @@ app.get('/api/pacientes', async (req, res) => {
              FROM pacientes
              WHERE id_usuario_mestre = ?
              ORDER BY nome_completo ASC`,
-            [USER_ID_FIXO]
+            [getUserId(req)]
         );
         res.json(rows);
     } catch (err) {
@@ -100,7 +164,7 @@ app.post('/api/pacientes', async (req, res) => {
             `INSERT INTO pacientes (id_usuario_mestre, nome_completo, email, cpf, telefone, status, data_nascimento, contato_emergencia)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [
-                USER_ID_FIXO,
+                getUserId(req),
                 nome_completo,
                 email || null,
                 cpf,
@@ -118,7 +182,7 @@ app.post('/api/pacientes', async (req, res) => {
                     telefone, status,
                     DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data_cadastro
              FROM pacientes WHERE id_paciente = ? AND id_usuario_mestre = ?`,
-            [result.insertId, USER_ID_FIXO]
+            [result.insertId, getUserId(req)]
         );
 
         res.status(201).json(rows[0]);
@@ -144,7 +208,7 @@ app.get('/api/pacientes/:id', async (req, res) => {
                     estado_civil, escolaridade, endereco, telefone, contato_emergencia,
                     queixa_principal, historico_familiar, medicacoes_em_uso, anamnese_texto, status
              FROM pacientes WHERE id_paciente = ? AND id_usuario_mestre = ?`,
-            [id, USER_ID_FIXO]
+            [id, getUserId(req)]
         );
         if (rows.length === 0) {
             return res.status(404).json({ erro: 'Paciente não encontrado.' });
@@ -183,7 +247,7 @@ app.put('/api/pacientes/:id', async (req, res) => {
                 nome_completo, email || null, cpf, telefone || null, status || 'Ativo', data_nascimento || null, contato_emergencia || null,
                 profissao || null, estado_civil || null, escolaridade || null, endereco || null,
                 queixa_principal || null, historico_familiar || null, medicacoes_em_uso || null, anamnese_texto || null,
-                id, USER_ID_FIXO
+                id, getUserId(req)
             ]
         );
 
@@ -198,7 +262,7 @@ app.put('/api/pacientes/:id', async (req, res) => {
                     telefone, status,
                     DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data_cadastro
              FROM pacientes WHERE id_paciente = ? AND id_usuario_mestre = ?`,
-            [id, USER_ID_FIXO]
+            [id, getUserId(req)]
         );
 
         res.json(rows[0]);
@@ -219,7 +283,7 @@ app.delete('/api/pacientes/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const [result] = await pool.query(
-            'DELETE FROM pacientes WHERE id_paciente = ? AND id_usuario_mestre = ?', [id, USER_ID_FIXO]
+            'DELETE FROM pacientes WHERE id_paciente = ? AND id_usuario_mestre = ?', [id, getUserId(req)]
         );
         if (result.affectedRows === 0) {
             return res.status(404).json({ erro: 'Paciente não encontrado.' });
@@ -247,7 +311,7 @@ app.get('/api/evolucoes/paciente/:id_paciente', async (req, res) => {
              FROM evolucoes 
              WHERE id_paciente = ? AND id_usuario_mestre = ?
              ORDER BY data_sessao DESC, id_evolucao DESC`,
-            [id_paciente, USER_ID_FIXO]
+            [id_paciente, getUserId(req)]
         );
         res.json(rows);
     } catch (err) {
@@ -269,7 +333,7 @@ app.get('/api/evolucoes/:id', async (req, res) => {
                     texto_evolucao, tipo_sessao, tags
              FROM evolucoes 
              WHERE id_evolucao = ? AND id_usuario_mestre = ?`,
-            [id, USER_ID_FIXO]
+            [id, getUserId(req)]
         );
         if (rows.length === 0) {
             return res.status(404).json({ erro: 'Evolução não encontrada.' });
@@ -296,7 +360,7 @@ app.post('/api/evolucoes', async (req, res) => {
         const [result] = await pool.query(
             `INSERT INTO evolucoes (id_usuario_mestre, id_paciente, data_sessao, texto_evolucao, tipo_sessao, tags)
              VALUES (?, ?, ?, ?, ?, ?)`,
-            [USER_ID_FIXO, id_paciente, data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null]
+            [getUserId(req), id_paciente, data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null]
         );
 
         res.status(201).json({ id_evolucao: result.insertId, mensagem: 'Evolução criada com sucesso.' });
@@ -323,7 +387,7 @@ app.put('/api/evolucoes/:id', async (req, res) => {
             `UPDATE evolucoes 
              SET data_sessao = ?, texto_evolucao = ?, tipo_sessao = ?, tags = ?
              WHERE id_evolucao = ? AND id_usuario_mestre = ?`,
-            [data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null, id, USER_ID_FIXO]
+            [data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null, id, getUserId(req)]
         );
 
         if (result.affectedRows === 0) {
@@ -344,7 +408,7 @@ app.delete('/api/evolucoes/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const [result] = await pool.query(
-            'DELETE FROM evolucoes WHERE id_evolucao = ? AND id_usuario_mestre = ?', [id, USER_ID_FIXO]
+            'DELETE FROM evolucoes WHERE id_evolucao = ? AND id_usuario_mestre = ?', [id, getUserId(req)]
         );
         if (result.affectedRows === 0) {
             return res.status(404).json({ erro: 'Evolução não encontrada.' });
@@ -373,7 +437,7 @@ app.get('/api/financeiro', async (req, res) => {
         LEFT JOIN pacientes p ON f.id_paciente = p.id_paciente
         WHERE f.id_usuario_mestre = ?
     `;
-    const queryParams = [USER_ID_FIXO];
+    const queryParams = [getUserId(req)];
 
     if (mes && ano) {
         query += ` AND MONTH(f.data_vencimento) = ? AND YEAR(f.data_vencimento) = ?`;
@@ -403,7 +467,7 @@ app.get('/api/financeiro/:id', async (req, res) => {
                     DATE_FORMAT(f.data_vencimento, '%Y-%m-%d') AS data_vencimento
              FROM financeiro f
              WHERE f.id_lancamento = ? AND f.id_usuario_mestre = ?`,
-            [id, USER_ID_FIXO]
+            [id, getUserId(req)]
         );
         if (rows.length === 0) {
             return res.status(404).json({ erro: 'Lançamento não encontrado.' });
@@ -431,7 +495,7 @@ app.post('/api/financeiro', async (req, res) => {
             `INSERT INTO financeiro (id_usuario_mestre, id_paciente, descricao, valor, tipo, status_pagamento, data_vencimento)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
-                USER_ID_FIXO,
+                getUserId(req),
                 id_paciente || null, 
                 descricao, 
                 valor, 
@@ -473,7 +537,7 @@ app.put('/api/financeiro/:id', async (req, res) => {
                 status_pagamento || 'Pendente', 
                 data_vencimento, 
                 id,
-                USER_ID_FIXO
+                getUserId(req)
             ]
         );
 
@@ -495,7 +559,7 @@ app.delete('/api/financeiro/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const [result] = await pool.query(
-            'DELETE FROM financeiro WHERE id_lancamento = ? AND id_usuario_mestre = ?', [id, USER_ID_FIXO]
+            'DELETE FROM financeiro WHERE id_lancamento = ? AND id_usuario_mestre = ?', [id, getUserId(req)]
         );
         if (result.affectedRows === 0) {
             return res.status(404).json({ erro: 'Lançamento não encontrado.' });
@@ -518,19 +582,19 @@ app.get('/api/dashboard/stats', async (req, res) => {
         // 1. Pacientes Ativos
         const [[{ totalAtivos }]] = await pool.query(
             'SELECT COUNT(*) AS totalAtivos FROM pacientes WHERE status = "Ativo" AND id_usuario_mestre = ?',
-            [USER_ID_FIXO]
+            [getUserId(req)]
         );
 
         // 2. Sessões Hoje
         const [[{ totalHoje }]] = await pool.query(
             'SELECT COUNT(*) AS totalHoje FROM agenda WHERE data_sessao = CURDATE() AND id_usuario_mestre = ?',
-            [USER_ID_FIXO]
+            [getUserId(req)]
         );
 
         // 3. Sessões Pendentes Hoje (Agendadas e não realizadas)
         const [[{ totalPendentes }]] = await pool.query(
             'SELECT COUNT(*) AS totalPendentes FROM agenda WHERE data_sessao = CURDATE() AND status = "Agendada" AND id_usuario_mestre = ?',
-            [USER_ID_FIXO]
+            [getUserId(req)]
         );
 
         // 4. Faturamento Mês (Receitas pagas no mês atual)
@@ -541,7 +605,7 @@ app.get('/api/dashboard/stats', async (req, res) => {
                AND MONTH(data_vencimento) = MONTH(CURDATE()) 
                AND YEAR(data_vencimento) = YEAR(CURDATE())
                AND id_usuario_mestre = ?`,
-            [USER_ID_FIXO]
+            [getUserId(req)]
         );
 
         res.json({
@@ -573,7 +637,7 @@ app.get('/api/agenda', async (req, res) => {
              JOIN pacientes p ON a.id_paciente = p.id_paciente
              WHERE a.id_usuario_mestre = ?
              ORDER BY a.data_sessao ASC, a.hora_sessao ASC`,
-            [USER_ID_FIXO]
+            [getUserId(req)]
         );
         res.json(rows);
     } catch (err) {
@@ -596,7 +660,7 @@ app.post('/api/agenda', async (req, res) => {
         const [result] = await pool.query(
             `INSERT INTO agenda (id_usuario_mestre, id_paciente, data_sessao, hora_sessao, status)
              VALUES (?, ?, ?, ?, ?)`,
-            [USER_ID_FIXO, id_paciente, data_sessao, hora_sessao, status || 'Agendada']
+            [getUserId(req), id_paciente, data_sessao, hora_sessao, status || 'Agendada']
         );
         res.status(201).json({ id_agenda: result.insertId, mensagem: 'Sessão agendada com sucesso.' });
     } catch (err) {
@@ -614,7 +678,7 @@ app.get('/api/agenda/:id', async (req, res) => {
     try {
         const [rows] = await pool.query(
             'SELECT * FROM agenda WHERE id_agenda = ? AND id_usuario_mestre = ?',
-            [id, USER_ID_FIXO]
+            [id, getUserId(req)]
         );
         if (rows.length === 0) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
         res.json(rows[0]);
@@ -631,7 +695,7 @@ app.put('/api/agenda/:id', async (req, res) => {
             `UPDATE agenda 
              SET id_paciente = ?, data_sessao = ?, hora_sessao = ?, status = ?
              WHERE id_agenda = ? AND id_usuario_mestre = ?`,
-            [id_paciente, data_sessao, hora_sessao, status, id, USER_ID_FIXO]
+            [id_paciente, data_sessao, hora_sessao, status, id, getUserId(req)]
         );
         if (result.affectedRows === 0) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
         res.json({ mensagem: 'Agendamento atualizado com sucesso.' });
@@ -649,7 +713,7 @@ app.delete('/api/agenda/:id', async (req, res) => {
     try {
         const [result] = await pool.query(
             'DELETE FROM agenda WHERE id_agenda = ? AND id_usuario_mestre = ?',
-            [id, USER_ID_FIXO]
+            [id, getUserId(req)]
         );
         if (result.affectedRows === 0) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
         res.json({ mensagem: 'Agendamento removido com sucesso.' });

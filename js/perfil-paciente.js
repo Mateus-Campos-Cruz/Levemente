@@ -19,7 +19,7 @@ async function carregarPerfilPaciente() {
     }
 
     try {
-        const res = await fetch(`http://localhost:3000/api/pacientes/${id}`);
+        const res = await fetch(`http://localhost:3000/api/pacientes/${id}`, { headers: getAuthHeaders() });
         
         if (!res.ok) {
             throw new Error('Erro ao buscar dados do paciente.');

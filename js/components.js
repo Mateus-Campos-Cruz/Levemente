@@ -1,10 +1,34 @@
 // js/components.js
+
+/**
+ * Retorna os headers necessários para as requisições autenticadas
+ */
+function getAuthHeaders() {
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (!usuario || !usuario.id) {
+        // Redireciona para o login se não houver usuário no localStorage
+        window.location.href = '/';
+        return {};
+    }
+    return {
+        'Content-Type': 'application/json',
+        'x-user-id': usuario.id
+    };
+}
+
 document.addEventListener("DOMContentLoaded", function() {
+    // Verificar autenticação em páginas protegidas (quase todas exceto a index)
+    const currentPage = window.location.pathname.split("/").pop();
+    if (currentPage !== 'index.html' && currentPage !== '') {
+        const usuario = localStorage.getItem('usuario');
+        if (!usuario) {
+            window.location.href = '/';
+            return;
+        }
+    }
+
     const sidebar = document.getElementById('sidebar-component');
     if (sidebar) {
-        // Pega o nome do arquivo atual (ex: financeiro.html)
-        const currentPage = window.location.pathname.split("/").pop();
-
         // Função auxiliar para verificar se é o link atual
         const isActive = (pageName) => currentPage === pageName ? 'active' : '';
 
@@ -29,8 +53,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 <a href="configuracoes.html" class="${isActive('configuracoes.html')}">
                     <i class="fas fa-cog"></i> Configurações
                 </a>
+                <a href="#" id="btn-logout" style="color: #64748b; margin-top: auto;">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
             </nav>
         `;
+
+        document.getElementById('btn-logout').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('usuario');
+            window.location.href = '/';
+        });
     }
 });
 
@@ -38,7 +71,6 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener('input', function(e) {
     const el = e.target;
     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        // Ignorar tipos que não devem ser maiúsculos
         const ignoredTypes = ['password', 'date', 'month', 'color', 'file', 'checkbox', 'radio'];
         if (!ignoredTypes.includes(el.type)) {
             el.value = el.value.toUpperCase();

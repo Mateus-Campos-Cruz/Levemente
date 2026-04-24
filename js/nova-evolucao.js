@@ -28,7 +28,7 @@ async function carregarCabecalho() {
     };
 
     try {
-        const res = await fetch(`http://localhost:3000/api/pacientes/${pacienteId}`);
+        const res = await fetch(`http://localhost:3000/api/pacientes/${pacienteId}`, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Erro ao buscar paciente');
         const p = await res.json();
 
@@ -71,7 +71,7 @@ function configurarFormulario() {
         try {
             const res = await fetch('http://localhost:3000/api/evolucoes', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(payload)
             });
 

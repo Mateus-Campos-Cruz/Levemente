@@ -36,7 +36,7 @@ function closeModal(id) {
 
 async function carregarPacientes() {
     try {
-        const res = await fetch(API_PACIENTES);
+        const res = await fetch(API_PACIENTES, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Erro ao buscar pacientes');
         const pacientes = await res.json();
         
@@ -55,7 +55,7 @@ async function carregarPacientes() {
 
 async function carregarDadosLancamento() {
     try {
-        const res = await fetch(`${API_FINANCEIRO}/${idLancamento}`);
+        const res = await fetch(`${API_FINANCEIRO}/${idLancamento}`, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Lançamento não encontrado');
         const data = await res.json();
 
@@ -118,7 +118,7 @@ async function executarSalvamento() {
     try {
         const res = await fetch(`${API_FINANCEIRO}/${idLancamento}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify(payload)
         });
 

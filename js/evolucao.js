@@ -40,7 +40,7 @@ async function carregarCabecalhoEEvolucoes() {
 
     // Busca paciente
     try {
-        const res = await fetch(`http://localhost:3000/api/pacientes/${id}`);
+        const res = await fetch(`http://localhost:3000/api/pacientes/${id}`, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Erro ao buscar paciente');
         const p = await res.json();
 
@@ -61,7 +61,7 @@ async function carregarCabecalhoEEvolucoes() {
 
 async function carregarListaEvolucoes() {
     try {
-        const res = await fetch(`http://localhost:3000/api/evolucoes/paciente/${pacienteIdAtual}`);
+        const res = await fetch(`http://localhost:3000/api/evolucoes/paciente/${pacienteIdAtual}`, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Erro ao buscar evoluções');
         const evolucoes = await res.json();
 
@@ -126,7 +126,8 @@ document.getElementById('btnConfirmarDeleteEvolucao').addEventListener('click', 
 
     try {
         const res = await fetch(`http://localhost:3000/api/evolucoes/${evolucaoIdParaDeletar}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
 
         if (!res.ok) throw new Error('Erro ao deletar.');

@@ -68,7 +68,7 @@ async function configurarFormulario() {
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(payload),
             });
 
@@ -135,7 +135,7 @@ async function carregarPacientes() {
         </tr>`;
 
     try {
-        const res = await fetch(API_URL);
+        const res = await fetch(API_URL, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Resposta inválida do servidor.');
 
         const pacientes = await res.json();
@@ -249,6 +249,7 @@ async function excluirPaciente(id) {
     try {
         const res = await fetch(`http://localhost:3000/api/pacientes/${id}`, {
             method: 'DELETE',
+            headers: getAuthHeaders()
         });
 
         if (!res.ok) {
@@ -286,7 +287,7 @@ function abrirProntuario(id) {
 
 async function editarPaciente(id) {
     try {
-        const res = await fetch(`http://localhost:3000/api/pacientes/${id}`);
+        const res = await fetch(`http://localhost:3000/api/pacientes/${id}`, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Falha ao buscar paciente');
         const p = await res.json();
 

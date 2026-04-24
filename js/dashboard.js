@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 async function carregarEstatisticas() {
     try {
-        const res = await fetch(API_DASH_STATS);
+        const res = await fetch(API_DASH_STATS, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Erro ao buscar estatísticas');
         const stats = await res.json();
 
@@ -46,7 +46,7 @@ async function carregarSessoesPendentes() {
     if (!lista) return;
 
     try {
-        const res = await fetch(API_AGENDA);
+        const res = await fetch(API_AGENDA, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Erro ao buscar agenda');
         const agenda = await res.json();
 
