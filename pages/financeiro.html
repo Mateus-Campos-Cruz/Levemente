@@ -33,10 +33,28 @@
             </div>
 
             <div style="margin-bottom: 30px; display: flex;">
-                <div style="display: flex; align-items: center; gap: 10px; background: #fff; padding: 10px 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--primary-color);">
-                    <i class="fas fa-calendar-alt" style="color: var(--primary-color);"></i>
-                    <label for="filtroMes" style="font-weight: 600; color: var(--text-light); font-size: 0.95rem;">Período:</label>
-                    <input type="month" id="filtroMes" style="border: 1px solid var(--primary-color); border-radius: 6px; padding: 6px 12px; outline-color: var(--primary-color); color: var(--text-dark); font-family: inherit; font-size: 0.95rem; cursor: pointer; background: #fff;">
+                <div class="nav-group">
+                    <button id="prevMonth" class="btn-nav" title="Mês Anterior"><i class="fas fa-chevron-left"></i></button>
+                    <div class="select-group">
+                        <select id="selectMonth" class="select-clean">
+                            <option value="0">Janeiro</option>
+                            <option value="1">Fevereiro</option>
+                            <option value="2">Março</option>
+                            <option value="3">Abril</option>
+                            <option value="4">Maio</option>
+                            <option value="5">Junho</option>
+                            <option value="6">Julho</option>
+                            <option value="7">Agosto</option>
+                            <option value="8">Setembro</option>
+                            <option value="9">Outubro</option>
+                            <option value="10">Novembro</option>
+                            <option value="11">Dezembro</option>
+                        </select>
+                        <select id="selectYear" class="select-clean">
+                            <!-- Populado via JS -->
+                        </select>
+                    </div>
+                    <button id="nextMonth" class="btn-nav" title="Próximo Mês"><i class="fas fa-chevron-right"></i></button>
                 </div>
             </div>
 

@@ -7,13 +7,31 @@ const API_FINANCEIRO = 'http://localhost:3000/api/financeiro';
 const API_PACIENTES = 'http://localhost:3000/api/pacientes';
 
 let idLancamentoExcluir = null;
+let currentYear, currentMonth;
 
 document.addEventListener("DOMContentLoaded", () => {
-    configurarFiltroMes();
+    const now = new Date();
+    currentYear = now.getFullYear();
+    currentMonth = now.getMonth();
+
+    inicializarFiltros();
     configurarBusca();
     carregarPacientes();
     configurarFormFinanceiro();
+    carregarLancamentos(currentMonth + 1, currentYear);
     
+    // Listeners de Navegação (Estilo Agenda)
+    document.getElementById('prevMonth').addEventListener('click', () => navegarMes(-1));
+    document.getElementById('nextMonth').addEventListener('click', () => navegarMes(1));
+    document.getElementById('selectMonth').addEventListener('change', (e) => {
+        currentMonth = parseInt(e.target.value);
+        carregarLancamentos(currentMonth + 1, currentYear);
+    });
+    document.getElementById('selectYear').addEventListener('change', (e) => {
+        currentYear = parseInt(e.target.value);
+        carregarLancamentos(currentMonth + 1, currentYear);
+    });
+
     // Configurar exclusão
     const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
     if (btnConfirmarExclusao) {
@@ -21,31 +39,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// --- FILTRO DE MÊS ---
+// --- FILTRO DE MÊS (ESTILO AGENDA) ---
 
-function configurarFiltroMes() {
-    const inputMes = document.getElementById('filtroMes');
-    if (!inputMes) return;
+function inicializarFiltros() {
+    const selectYear = document.getElementById('selectYear');
+    const selectMonth = document.getElementById('selectMonth');
+    
+    // Popula anos (5 anos para trás e 5 para frente)
+    const year = new Date().getFullYear();
+    for (let i = year - 5; i <= year + 5; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = i;
+        if (i === currentYear) opt.selected = true;
+        selectYear.appendChild(opt);
+    }
+    
+    selectMonth.value = currentMonth;
+}
 
-    // Setar o mês atual como padrão
-    const hoje = new Date();
-    const ano = hoje.getFullYear();
-    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-    inputMes.value = `${ano}-${mes}`;
-
-    // Carregar lançamentos iniciais
-    carregarLancamentos(mes, ano);
-
-    // Evento de mudança no filtro
-    inputMes.addEventListener('change', (e) => {
-        const [novoAno, novoMes] = e.target.value.split('-');
-        if (novoAno && novoMes) {
-            carregarLancamentos(novoMes, novoAno);
-        } else {
-            // Se o campo for limpo, carrega tudo (ou você pode forçar um valor)
-            carregarLancamentos();
-        }
-    });
+function navegarMes(direcao) {
+    currentMonth += direcao;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    } else if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    
+    document.getElementById('selectMonth').value = currentMonth;
+    document.getElementById('selectYear').value = currentYear;
+    carregarLancamentos(currentMonth + 1, currentYear);
 }
 
 // --- FILTRO DE BUSCA ---
@@ -182,13 +207,7 @@ function configurarFormFinanceiro() {
             form.reset();
             
             // Recarrega de acordo com o filtro atual
-            const inputMes = document.getElementById('filtroMes');
-            if (inputMes && inputMes.value) {
-                const [ano, mes] = inputMes.value.split('-');
-                carregarLancamentos(mes, ano);
-            } else {
-                carregarLancamentos();
-            }
+            carregarLancamentos(currentMonth + 1, currentYear);
 
         } catch (error) {
             console.error(error);
@@ -239,10 +258,10 @@ function adicionarLinhaFinanceira(item) {
         <td><span style="${corTextoStatus}; font-weight: 600;">${item.status_pagamento}</span></td>
         <td class="actions">
             <button class="btn-icon" title="Editar" onclick="editarLancamento(${item.id_lancamento})">
-                <i class="fas fa-edit" style="color: var(--primary-color);"></i>
+                <i class="fas fa-edit" style="color: var(--pink-accent);"></i>
             </button>
             <button class="btn-icon" title="Excluir" onclick="abrirModalExcluir(${item.id_lancamento})">
-                <i class="fas fa-trash-alt" style="color: var(--danger-color);"></i>
+                <i class="fas fa-trash-alt" style="color: #ef4444;"></i>
             </button>
         </td>
     `;
@@ -274,13 +293,7 @@ async function confirmarExclusao() {
         closeModal('modalExcluir');
         idLancamentoExcluir = null;
 
-        const inputMes = document.getElementById('filtroMes');
-        if (inputMes && inputMes.value) {
-            const [ano, mes] = inputMes.value.split('-');
-            carregarLancamentos(mes, ano);
-        } else {
-            carregarLancamentos();
-        }
+        carregarLancamentos(currentMonth + 1, currentYear);
     } catch (error) {
         console.error(error);
         alert('Falha ao excluir o lançamento.');
