@@ -25,17 +25,14 @@
             <div class="config-container">
                 
                 <nav class="config-menu">
-                    <button class="menu-item active" onclick="showTab('profile')">
+                    <button class="menu-item active" onclick="showTab('profile', event)">
                         <i class="fas fa-user-circle"></i> Meu Perfil
                     </button>
-                    <button class="menu-item" onclick="showTab('security')">
+                    <button class="menu-item" onclick="showTab('security', event)">
                         <i class="fas fa-shield-alt"></i> Segurança
                     </button>
-                    <button class="menu-item" onclick="showTab('notifications')">
+                    <button class="menu-item" onclick="showTab('notifications', event)">
                         <i class="fas fa-bell"></i> Notificações
-                    </button>
-                    <button class="menu-item danger" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i> Sair da Conta
                     </button>
                 </nav>
 
@@ -45,23 +42,23 @@
                         <h3>Dados Profissionais</h3>
                         <p class="subtitle">Gerencie suas informações que aparecem nos recibos e prontuários.</p>
                         
-                        <form class="config-form">
+                        <form class="config-form" id="profile-form">
                             <div class="form-grid">
                                 <div class="input-group">
                                     <label>Nome Completo</label>
-                                    <input type="text" value="Mateus Campos Cruz">
+                                    <input type="text" id="prof-nome" placeholder="Seu nome completo">
                                 </div>
                                 <div class="input-group">
                                     <label>Registro Profissional (CRP)</label>
-                                    <input type="text" value="04/12345">
+                                    <input type="text" id="prof-crp" placeholder="Ex: 04/12345">
                                 </div>
                                 <div class="input-group">
                                     <label>E-mail de Acesso</label>
-                                    <input type="email" value="mateus@email.com">
+                                    <input type="email" id="prof-email" readonly title="O e-mail não pode ser alterado diretamente">
                                 </div>
                                 <div class="input-group">
                                     <label>Especialidade</label>
-                                    <input type="text" placeholder="Ex: TCC, Psicanálise...">
+                                    <input type="text" id="prof-especialidade" placeholder="Ex: TCC, Psicanálise...">
                                 </div>
                             </div>
                             <button type="submit" class="btn-primary">Salvar Alterações</button>
@@ -70,19 +67,45 @@
 
                     <div id="security" class="tab-pane">
                         <h3>Alterar Senha</h3>
-                        <form class="config-form">
-                            <div class="input-group">
+                        <p class="subtitle">Mantenha sua conta segura com uma senha forte.</p>
+                        
+                        <form class="config-form" id="password-form">
+                            <div class="input-group password-field">
                                 <label>Senha Atual</label>
-                                <input type="password" placeholder="••••••••">
+                                <div class="input-with-icon">
+                                    <input type="password" id="pass-current" placeholder="••••••••" required>
+                                    <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('pass-current')"></i>
+                                </div>
                             </div>
-                            <div class="input-group">
-                                <label>Nova Senha</label>
-                                <input type="password" placeholder="Nova senha">
+                            
+                            <div class="password-grid">
+                                <div class="input-group password-field">
+                                    <label>Nova Senha</label>
+                                    <div class="input-with-icon">
+                                        <input type="password" id="pass-new" placeholder="Nova senha" required>
+                                        <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('pass-new')"></i>
+                                    </div>
+                                </div>
+                                <div class="input-group password-field">
+                                    <label>Confirmar Nova Senha</label>
+                                    <div class="input-with-icon">
+                                        <input type="password" id="pass-confirm" placeholder="Repita a nova senha" required>
+                                        <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('pass-confirm')"></i>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="input-group">
-                                <label>Confirmar Nova Senha</label>
-                                <input type="password" placeholder="Repita a nova senha">
+
+                            <div class="password-criteria" id="password-criteria">
+                                <p>A nova senha deve conter:</p>
+                                <ul>
+                                    <li id="crit-length" class="invalid"><i class="fas fa-circle"></i> Mínimo 6 caracteres</li>
+                                    <li id="crit-upper" class="invalid"><i class="fas fa-circle"></i> Uma letra maiúscula</li>
+                                    <li id="crit-number" class="invalid"><i class="fas fa-circle"></i> Um número</li>
+                                    <li id="crit-special" class="invalid"><i class="fas fa-circle"></i> Um caractere especial (!@#$...)</li>
+                                    <li id="crit-match" class="invalid"><i class="fas fa-circle"></i> As senhas coincidem</li>
+                                </ul>
                             </div>
+
                             <button type="submit" class="btn-primary">Atualizar Senha</button>
                         </form>
                     </div>
@@ -91,15 +114,25 @@
             </div>
         </section>
     </main>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3 id="modal-title">Confirmar Alteração</h3>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">Deseja realmente salvar as alterações?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button id="modal-confirm-btn" class="btn-primary">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/components.js"></script>
-    <script>
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-    </script>
+    <script src="../js/configuracoes.js"></script>
 </body>
-</html>
+</html>

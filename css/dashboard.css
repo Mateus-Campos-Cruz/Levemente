@@ -15,9 +15,9 @@
     font-family: 'Inter', sans-serif;
 }
 
-/* Forçar visual em letras maiúsculas para inputs */
-input:not([type="password"]):not([type="date"]):not([type="month"]), 
-textarea, 
+/* Forçar visual em letras maiúsculas para inputs (exceto senhas e campos específicos) */
+input:not([type="password"]):not([type="date"]):not([type="month"]):not(#password-form input), 
+textarea:not(#password-form textarea), 
 select {
     text-transform: uppercase;
 }

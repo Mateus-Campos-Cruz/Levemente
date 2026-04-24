@@ -117,6 +117,101 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+// ─── API: USUÁRIO (ME) ────────────────────────────────────
+
+/**
+ * GET /api/usuario/me
+ * Retorna os dados do usuário logado
+ */
+app.get('/api/usuario/me', async (req, res) => {
+    const userId = getUserId(req);
+    if (!userId) return res.status(401).json({ erro: 'Não autorizado.' });
+
+    try {
+        const [rows] = await pool.query(
+            'SELECT id_usuario_mestre, nome, email, registro_profissional, especialidade FROM usuario_mestre WHERE id_usuario_mestre = ?',
+            [userId]
+        );
+        
+        if (rows.length === 0) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
+
+        res.json(rows[0]);
+    } catch (err) {
+        console.error('Erro GET /api/usuario/me:', err);
+        res.status(500).json({ erro: 'Erro ao buscar dados do usuário.' });
+    }
+});
+
+/**
+ * PUT /api/usuario/me
+ * Atualiza os dados do perfil do usuário
+ */
+app.put('/api/usuario/me', async (req, res) => {
+    const userId = getUserId(req);
+    const { nome, registro_profissional, especialidade } = req.body;
+
+    if (!userId) return res.status(401).json({ erro: 'Não autorizado.' });
+    if (!nome) return res.status(400).json({ erro: 'Nome é obrigatório.' });
+
+    try {
+        await pool.query(
+            `UPDATE usuario_mestre 
+             SET nome = ?, registro_profissional = ?, especialidade = ?
+             WHERE id_usuario_mestre = ?`,
+            [nome, registro_profissional || null, especialidade || null, userId]
+        );
+
+        res.json({ mensagem: 'Perfil atualizado com sucesso.' });
+    } catch (err) {
+        console.error('Erro PUT /api/usuario/me:', err);
+        res.status(500).json({ erro: 'Erro ao atualizar perfil.' });
+    }
+});
+
+/**
+ * PUT /api/usuario/me/senha
+ * Atualiza a senha do usuário
+ */
+app.put('/api/usuario/me/senha', async (req, res) => {
+    const userId = getUserId(req);
+    const { senhaAtual, novaSenha } = req.body;
+
+    if (!userId) return res.status(401).json({ erro: 'Não autorizado.' });
+    if (!senhaAtual || !novaSenha) {
+        return res.status(400).json({ erro: 'Senha atual e nova senha são obrigatórias.' });
+    }
+
+    try {
+        const [rows] = await pool.query('SELECT senha_hash FROM usuario_mestre WHERE id_usuario_mestre = ?', [userId]);
+        
+        if (rows.length === 0) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
+
+        const usuario = rows[0];
+        const senhaValida = await bcrypt.compare(senhaAtual, usuario.senha_hash);
+
+        if (!senhaValida) {
+            return res.status(401).json({ erro: 'Senha atual incorreta.' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const novaSenhaHash = await bcrypt.hash(novaSenha, salt);
+
+        await pool.query(
+            'UPDATE usuario_mestre SET senha_hash = ? WHERE id_usuario_mestre = ?',
+            [novaSenhaHash, userId]
+        );
+
+        res.json({ mensagem: 'Senha atualizada com sucesso.' });
+    } catch (err) {
+        console.error('Erro PUT /api/usuario/me/senha:', err);
+        res.status(500).json({ erro: 'Erro ao atualizar senha.' });
+    }
+});
+
 // ─── API: PACIENTES ───────────────────────────────────────
 
 /**

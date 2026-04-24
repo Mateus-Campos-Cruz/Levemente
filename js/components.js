@@ -74,7 +74,12 @@ document.addEventListener('input', function(e) {
     const el = e.target;
     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         const ignoredTypes = ['password', 'date', 'month', 'color', 'file', 'checkbox', 'radio'];
-        if (!ignoredTypes.includes(el.type)) {
+        
+        // Exceção para campos de senha na página de configurações (mesmo quando o tipo muda para 'text')
+        const isPasswordField = el.id && el.id.startsWith('pass-');
+        const isInsidePasswordForm = el.closest('#password-form');
+
+        if (!ignoredTypes.includes(el.type) && !isPasswordField && !isInsidePasswordForm) {
             el.value = el.value.toUpperCase();
         }
     }
