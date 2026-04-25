@@ -8,6 +8,7 @@ const API_PACIENTES = 'http://localhost:3000/api/pacientes';
 
 let idLancamentoExcluir = null;
 let currentYear, currentMonth;
+let listaPacientes = []; // Cache para busca dinâmica
 
 document.addEventListener("DOMContentLoaded", () => {
     const now = new Date();
@@ -15,8 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
     currentMonth = now.getMonth();
 
     inicializarFiltros();
-    configurarBusca();
+    configurarBuscaTabela();
     carregarPacientes();
+    configurarBuscaPaciente();
     configurarFormFinanceiro();
     carregarLancamentos(currentMonth + 1, currentYear);
     
@@ -32,20 +34,17 @@ document.addEventListener("DOMContentLoaded", () => {
         carregarLancamentos(currentMonth + 1, currentYear);
     });
 
-    // Configurar exclusão
     const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
     if (btnConfirmarExclusao) {
         btnConfirmarExclusao.addEventListener('click', confirmarExclusao);
     }
 });
 
-// --- FILTRO DE MÊS (ESTILO AGENDA) ---
+// --- FILTROS ---
 
 function inicializarFiltros() {
     const selectYear = document.getElementById('selectYear');
     const selectMonth = document.getElementById('selectMonth');
-    
-    // Popula anos (5 anos para trás e 5 para frente)
     const year = new Date().getFullYear();
     for (let i = year - 5; i <= year + 5; i++) {
         const opt = document.createElement('option');
@@ -54,7 +53,6 @@ function inicializarFiltros() {
         if (i === currentYear) opt.selected = true;
         selectYear.appendChild(opt);
     }
-    
     selectMonth.value = currentMonth;
 }
 
@@ -67,70 +65,105 @@ function navegarMes(direcao) {
         currentMonth = 0;
         currentYear++;
     }
-    
     document.getElementById('selectMonth').value = currentMonth;
     document.getElementById('selectYear').value = currentYear;
     carregarLancamentos(currentMonth + 1, currentYear);
 }
 
-// --- FILTRO DE BUSCA ---
-
-function configurarBusca() {
+function configurarBuscaTabela() {
     const inputBusca = document.getElementById('inputBuscaFinanceiro');
     if (!inputBusca) return;
-
     inputBusca.addEventListener('input', (e) => {
         const termo = e.target.value.toLowerCase();
         const linhas = document.querySelectorAll('.finance-row');
-        
         linhas.forEach(linha => {
             const textoLinha = linha.innerText.toLowerCase();
-            if (textoLinha.includes(termo)) {
-                linha.style.display = '';
-            } else {
-                linha.style.display = 'none';
-            }
+            linha.style.display = textoLinha.includes(termo) ? '' : 'none';
         });
     });
 }
 
-// --- API FETCH ---
+// --- BUSCA DINÂMICA DE PACIENTES NO MODAL ---
 
 async function carregarPacientes() {
     try {
         const res = await fetch(API_PACIENTES, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error('Erro ao buscar pacientes');
-        const pacientes = await res.json();
-        
-        const select = document.getElementById('id_paciente');
-        if (!select) return;
-
-        pacientes.forEach(p => {
-            const option = document.createElement('option');
-            option.value = p.id_paciente;
-            option.textContent = p.nome_completo;
-            select.appendChild(option);
-        });
+        listaPacientes = await res.json();
     } catch (error) {
         console.error(error);
     }
 }
 
+function configurarBuscaPaciente() {
+    const inputSearch = document.getElementById('paciente_search');
+    const inputId = document.getElementById('id_paciente');
+    const resultsContainer = document.getElementById('paciente_results');
+
+    if (!inputSearch || !resultsContainer) return;
+
+    inputSearch.addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase();
+        
+        // Se limpar o campo, limpa o ID também
+        if (!termo) {
+            inputId.value = "";
+            resultsContainer.classList.remove('active');
+            return;
+        }
+
+        const filtrados = listaPacientes.filter(p => 
+            p.nome_completo.toLowerCase().includes(termo)
+        );
+
+        renderizarResultadosBusca(filtrados);
+    });
+
+    // Fecha a lista ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select-container')) {
+            resultsContainer.classList.remove('active');
+        }
+    });
+}
+
+function renderizarResultadosBusca(pacientes) {
+    const resultsContainer = document.getElementById('paciente_results');
+    resultsContainer.innerHTML = '';
+    
+    if (pacientes.length === 0) {
+        resultsContainer.innerHTML = '<div class="result-item no-results">Nenhum paciente encontrado</div>';
+    } else {
+        pacientes.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'result-item';
+            div.textContent = p.nome_completo;
+            div.onclick = () => selecionarPaciente(p);
+            resultsContainer.appendChild(div);
+        });
+    }
+    
+    resultsContainer.classList.add('active');
+}
+
+function selecionarPaciente(paciente) {
+    document.getElementById('paciente_search').value = paciente.nome_completo;
+    document.getElementById('id_paciente').value = paciente.id_paciente;
+    document.getElementById('paciente_results').classList.remove('active');
+}
+
+// --- API FETCH ---
+
 async function carregarLancamentos(mes, ano) {
     try {
         let url = API_FINANCEIRO;
-        if (mes && ano) {
-            url += `?mes=${mes}&ano=${ano}`;
-        }
+        if (mes && ano) url += `?mes=${mes}&ano=${ano}`;
         const res = await fetch(url, { headers: getAuthHeaders() });
-        if (!res.ok) throw new Error('Erro ao buscar lançamentos');
         const lancamentos = await res.json();
-        
         renderizarTabela(lancamentos);
         atualizarResumo(lancamentos);
     } catch (error) {
         console.error(error);
-        alert('Erro ao carregar os dados financeiros.');
     }
 }
 
@@ -140,8 +173,11 @@ function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.style.display = "flex";
-        // Definir a data atual no form se for novo lançamento
         if (modalId === 'modalLancamento') {
+            // Resetar busca de paciente ao abrir
+            document.getElementById('paciente_search').value = "";
+            document.getElementById('id_paciente').value = "";
+            
             const dateInput = document.getElementById('data_vencimento');
             if (dateInput && !dateInput.value) {
                 dateInput.value = new Date().toISOString().split('T')[0];
@@ -156,9 +192,7 @@ function closeModal(modalId) {
 }
 
 window.addEventListener('click', (event) => {
-    if (event.target.classList.contains('modal')) {
-        event.target.style.display = "none";
-    }
+    if (event.target.classList.contains('modal')) event.target.style.display = "none";
 });
 
 // --- FORMULÁRIO ---
@@ -182,14 +216,7 @@ function configurarFormFinanceiro() {
             return;
         }
 
-        const payload = {
-            id_paciente: id_paciente || null,
-            descricao,
-            valor,
-            data_vencimento,
-            tipo,
-            status_pagamento
-        };
+        const payload = { id_paciente: id_paciente || null, descricao, valor, data_vencimento, tipo, status_pagamento };
 
         try {
             const res = await fetch(API_FINANCEIRO, {
@@ -197,20 +224,11 @@ function configurarFormFinanceiro() {
                 headers: getAuthHeaders(),
                 body: JSON.stringify(payload)
             });
-
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.erro || 'Erro ao cadastrar lançamento');
-            }
-
+            if (!res.ok) throw new Error('Erro ao salvar lançamento');
             closeModal('modalLancamento');
             form.reset();
-            
-            // Recarrega de acordo com o filtro atual
             carregarLancamentos(currentMonth + 1, currentYear);
-
         } catch (error) {
-            console.error(error);
             alert(error.message);
         }
     });
@@ -221,13 +239,11 @@ function configurarFormFinanceiro() {
 function renderizarTabela(lista) {
     const tabela = document.getElementById('tabelaFinanceira');
     if (!tabela) return;
-    tabela.innerHTML = ''; // Limpar tabela
-
+    tabela.innerHTML = '';
     if (lista.length === 0) {
         tabela.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">Nenhum lançamento encontrado para este mês.</td></tr>';
         return;
     }
-
     lista.forEach(item => adicionarLinhaFinanceira(item));
 }
 
@@ -235,15 +251,10 @@ function adicionarLinhaFinanceira(item) {
     const tabela = document.getElementById('tabelaFinanceira');
     const valor = Number(item.valor);
     const valorFormatado = isNaN(valor) ? '0.00' : valor.toFixed(2).replace('.', ',');
-
-    // Estilos das Tags
-    // Receita: texto azul, Despesa: texto vermelho, Pendente: texto amarelo
     let corTextoTipo = item.tipo === 'Receita' ? 'color: #1890ff;' : 'color: #f5222d;';
     let corTextoStatus = item.status_pagamento === 'Pendente' ? 'color: #faad14;' : 'color: #52c41a;';
-
     const [ano, mes, dia] = item.data_vencimento.split('-');
     const dataFormatada = `${dia}/${mes}/${ano}`;
-
     const tr = document.createElement('tr');
     tr.className = 'finance-row';
     tr.innerHTML = `
@@ -265,67 +276,32 @@ function adicionarLinhaFinanceira(item) {
             </button>
         </td>
     `;
-
     tabela.appendChild(tr);
 }
 
-// --- AÇÕES ---
+function editarLancamento(id) { window.location.href = `lancamento_edit.html?id=${id}`; }
 
-function editarLancamento(id) {
-    window.location.href = `lancamento_edit.html?id=${id}`;
-}
-
-function abrirModalExcluir(id) {
-    idLancamentoExcluir = id;
-    openModal('modalExcluir');
-}
+function abrirModalExcluir(id) { idLancamentoExcluir = id; openModal('modalExcluir'); }
 
 async function confirmarExclusao() {
     if (!idLancamentoExcluir) return;
-
     try {
-        const res = await fetch(`${API_FINANCEIRO}/${idLancamentoExcluir}`, { 
-            method: 'DELETE',
-            headers: getAuthHeaders()
-        });
-        if (!res.ok) throw new Error('Erro ao excluir lançamento');
-
+        const res = await fetch(`${API_FINANCEIRO}/${idLancamentoExcluir}`, { method: 'DELETE', headers: getAuthHeaders() });
         closeModal('modalExcluir');
         idLancamentoExcluir = null;
-
         carregarLancamentos(currentMonth + 1, currentYear);
-    } catch (error) {
-        console.error(error);
-        alert('Falha ao excluir o lançamento.');
-    }
+    } catch (error) { alert('Falha ao excluir o lançamento.'); }
 }
 
-// --- RESUMO FINANCEIRO ---
-
 function atualizarResumo(lista) {
-    let receitaPaga = 0;
-    let receitaPendente = 0;
-    let despesaPaga = 0;
-    let despesaPendente = 0;
-
+    let recP = 0, recPend = 0, desP = 0, desPend = 0;
     lista.forEach(item => {
-        const valor = Number(item.valor) || 0;
-        if (item.tipo === 'Receita') {
-            if (item.status_pagamento === 'Pago') receitaPaga += valor;
-            else receitaPendente += valor;
-        } else if (item.tipo === 'Despesa') {
-            if (item.status_pagamento === 'Pago') despesaPaga += valor;
-            else despesaPendente += valor;
-        }
+        const v = Number(item.valor) || 0;
+        if (item.tipo === 'Receita') { if (item.status_pagamento === 'Pago') recP += v; else recPend += v; }
+        else { if (item.status_pagamento === 'Pago') desP += v; else desPend += v; }
     });
-
-    const elReceitaPaga = document.getElementById('receita-paga');
-    const elReceitaPendente = document.getElementById('receita-pendente');
-    const elDespesaPaga = document.getElementById('despesa-paga');
-    const elDespesaPendente = document.getElementById('despesa-pendente');
-
-    if (elReceitaPaga) elReceitaPaga.innerText = `R$ ${receitaPaga.toFixed(2).replace('.', ',')}`;
-    if (elReceitaPendente) elReceitaPendente.innerText = `R$ ${receitaPendente.toFixed(2).replace('.', ',')}`;
-    if (elDespesaPaga) elDespesaPaga.innerText = `R$ ${despesaPaga.toFixed(2).replace('.', ',')}`;
-    if (elDespesaPendente) elDespesaPendente.innerText = `R$ ${despesaPendente.toFixed(2).replace('.', ',')}`;
+    document.getElementById('receita-paga').innerText = `R$ ${recP.toFixed(2).replace('.', ',')}`;
+    document.getElementById('receita-pendente').innerText = `R$ ${recPend.toFixed(2).replace('.', ',')}`;
+    document.getElementById('despesa-paga').innerText = `R$ ${desP.toFixed(2).replace('.', ',')}`;
+    document.getElementById('despesa-pendente').innerText = `R$ ${desPend.toFixed(2).replace('.', ',')}`;
 }

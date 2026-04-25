@@ -52,6 +52,7 @@ async function carregarDadosPaciente() {
         document.getElementById('queixa_principal').value = p.queixa_principal || '';
         document.getElementById('historico_familiar').value = p.historico_familiar || '';
         document.getElementById('medicacoes_em_uso').value = p.medicacoes_em_uso || '';
+        document.getElementById('anamnese_texto').value = p.anamnese_texto || '';
 
     } catch (err) {
         console.error(err);
@@ -84,7 +85,8 @@ function configurarFormularioEdit() {
             status: document.getElementById('status').value,
             queixa_principal: document.getElementById('queixa_principal').value.trim(),
             historico_familiar: document.getElementById('historico_familiar').value.trim(),
-            medicacoes_em_uso: document.getElementById('medicacoes_em_uso').value.trim()
+            medicacoes_em_uso: document.getElementById('medicacoes_em_uso').value.trim(),
+            anamnese_texto: document.getElementById('anamnese_texto').value.trim()
         };
 
         try {

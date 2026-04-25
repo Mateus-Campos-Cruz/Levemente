@@ -7,6 +7,7 @@ const API_PACIENTES = 'http://localhost:3000/api/pacientes';
 
 let currentYear, currentMonth;
 let agendaData = [];
+let listaPacientes = []; // Cache para busca dinâmica
 let selectedDate = null;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -18,7 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     
     inicializarFiltros();
-    carregarPacientesNoSelect();
+    carregarPacientes();
+    configurarBuscaPaciente();
     inicializarAgenda();
     configurarFormularioAgenda();
     
@@ -45,8 +47,6 @@ async function inicializarAgenda() {
 function inicializarFiltros() {
     const selectYear = document.getElementById('selectYear');
     const selectMonth = document.getElementById('selectMonth');
-    
-    // Popula anos (5 anos para trás e 5 para frente)
     const year = new Date().getFullYear();
     for (let i = year - 5; i <= year + 5; i++) {
         const opt = document.createElement('option');
@@ -55,7 +55,6 @@ function inicializarFiltros() {
         if (i === currentYear) opt.selected = true;
         selectYear.appendChild(opt);
     }
-    
     selectMonth.value = currentMonth;
 }
 
@@ -68,7 +67,6 @@ function navegarMes(direcao) {
         currentMonth = 0;
         currentYear++;
     }
-    
     document.getElementById('selectMonth').value = currentMonth;
     document.getElementById('selectYear').value = currentYear;
     renderizarCalendario();
@@ -84,12 +82,10 @@ async function renderizarCalendario() {
     display.textContent = `${monthNames[currentMonth]} ${currentYear}`;
     grid.innerHTML = '';
 
-    // Lógica de dias
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const prevDaysInMonth = new Date(currentYear, currentMonth, 0).getDate();
 
-    // Dias do mês anterior
     for (let i = firstDay; i > 0; i--) {
         const div = document.createElement('div');
         div.className = 'day day-off';
@@ -97,42 +93,30 @@ async function renderizarCalendario() {
         grid.appendChild(div);
     }
 
-    // Dias do mês atual
-    await buscarAgenda(); // Carrega dados da API
+    await buscarAgenda();
 
     for (let i = 1; i <= daysInMonth; i++) {
         const div = document.createElement('div');
         div.className = 'day';
-        
         const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        
-        // Verifica se é hoje
         const hoje = new Date();
-        if (i === hoje.getDate() && currentMonth === hoje.getMonth() && currentYear === hoje.getFullYear()) {
-            div.classList.add('today');
-        }
-
-        // Verifica se está selecionado
-        if (selectedDate === dateStr) {
-            div.classList.add('selected');
-        }
+        const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+        
+        if (dateStr === hojeStr) div.classList.add('today');
+        if (selectedDate === dateStr) div.classList.add('selected');
 
         div.innerHTML = i;
-        
-        // Verifica sessões
         const temSessao = agendaData.some(s => s.data_sessao === dateStr);
         if (temSessao) {
             const dot = document.createElement('span');
             dot.className = 'event-dot';
             div.appendChild(dot);
         }
-
         div.addEventListener('click', () => selecionarDia(dateStr));
         grid.appendChild(div);
     }
 
-    // Completa o grid (dias do próximo mês)
-    const totalCells = 42; // 6 linhas x 7 dias
+    const totalCells = 42;
     const remainingCells = totalCells - grid.children.length;
     for (let i = 1; i <= remainingCells; i++) {
         const div = document.createElement('div');
@@ -145,11 +129,8 @@ async function renderizarCalendario() {
 async function buscarAgenda() {
     try {
         const res = await fetch(API_AGENDA, { headers: getAuthHeaders() });
-        if (!res.ok) throw new Error("Falha ao carregar agenda");
         agendaData = await res.json();
-    } catch (err) {
-        console.error(err);
-    }
+    } catch (err) { console.error(err); }
 }
 
 function selecionarDia(dateStr) {
@@ -161,12 +142,10 @@ function selecionarDia(dateStr) {
 function exibirDetalhesDia(dateStr) {
     const container = document.getElementById('day-details-container');
     const sessoesDia = agendaData.filter(s => s.data_sessao === dateStr);
-    
     const [ano, mes, dia] = dateStr.split('-');
     const dataFormatada = `${dia}/${mes}/${ano}`;
 
     let html = `<h3>Sessões em ${dataFormatada}</h3>`;
-
     if (sessoesDia.length === 0) {
         html += `<p class="no-events">Nenhuma sessão agendada para este dia.</p>`;
     } else {
@@ -179,37 +158,72 @@ function exibirDetalhesDia(dateStr) {
                         <span>${s.hora_sessao.substring(0, 5)} - ${s.status}</span>
                     </div>
                     <div class="actions">
-                        <button title="Remarcar"><i class="fas fa-sync-alt"></i></button>
-                        <button title="Falta" class="btn-danger"><i class="fas fa-user-times"></i></button>
+                        <button title="Remarcar" onclick='abrirModalEdicao(${JSON.stringify(s)})'><i class="fas fa-sync-alt"></i></button>
+                        <button title="Falta" class="btn-danger" onclick="marcarFalta(${s.id_agenda})"><i class="fas fa-user-times"></i></button>
                     </div>
                 </div>
             `;
         });
     }
-
     container.innerHTML = html;
 }
 
-// --- MODAL E FORMULÁRIO ---
+// --- BUSCA DE PACIENTES ---
 
-async function carregarPacientesNoSelect() {
-    const select = document.getElementById('paciente_id');
-    if (!select) return;
-
+async function carregarPacientes() {
     try {
         const res = await fetch(API_PACIENTES, { headers: getAuthHeaders() });
-        const pacientes = await res.json();
-        
-        pacientes.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.id_paciente;
-            opt.textContent = p.nome_completo;
-            select.appendChild(opt);
-        });
-    } catch (err) {
-        console.error("Erro ao carregar pacientes:", err);
-    }
+        listaPacientes = await res.json();
+    } catch (err) { console.error(err); }
 }
+
+function configurarBuscaPaciente() {
+    const inputSearch = document.getElementById('paciente_search');
+    const inputId = document.getElementById('paciente_id');
+    const resultsContainer = document.getElementById('paciente_results');
+
+    if (!inputSearch || !resultsContainer) return;
+
+    inputSearch.addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase();
+        if (!termo) {
+            inputId.value = "";
+            resultsContainer.classList.remove('active');
+            return;
+        }
+        const filtrados = listaPacientes.filter(p => p.nome_completo.toLowerCase().includes(termo));
+        renderizarResultadosBusca(filtrados);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select-container')) resultsContainer.classList.remove('active');
+    });
+}
+
+function renderizarResultadosBusca(pacientes) {
+    const container = document.getElementById('paciente_results');
+    container.innerHTML = '';
+    if (pacientes.length === 0) {
+        container.innerHTML = '<div class="result-item no-results">Nenhum paciente encontrado</div>';
+    } else {
+        pacientes.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'result-item';
+            div.textContent = p.nome_completo;
+            div.onclick = () => selecionarPaciente(p);
+            container.appendChild(div);
+        });
+    }
+    container.classList.add('active');
+}
+
+function selecionarPaciente(paciente) {
+    document.getElementById('paciente_search').value = paciente.nome_completo;
+    document.getElementById('paciente_id').value = paciente.id_paciente;
+    document.getElementById('paciente_results').classList.remove('active');
+}
+
+// --- FORMULÁRIO ---
 
 function configurarFormularioAgenda() {
     const form = document.getElementById('formNovaSessao');
@@ -217,60 +231,92 @@ function configurarFormularioAgenda() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const idEdit = document.getElementById('id_agenda_edit').value;
+        const dataS = document.getElementById('data_sessao').value;
+        const horaS = document.getElementById('hora_sessao').value;
         
+        if (new Date(`${dataS}T${horaS}`) < new Date()) {
+            alert('Não é possível agendar sessões em datas ou horários passados.');
+            return;
+        }
+
         const payload = {
             id_paciente: document.getElementById('paciente_id').value,
-            data_sessao: document.getElementById('data_sessao').value,
-            hora_sessao: document.getElementById('hora_sessao').value,
+            data_sessao: dataS,
+            hora_sessao: horaS,
+            link: document.getElementById('link_sessao').value || null,
             status: 'Agendada'
         };
 
+        if (!payload.id_paciente) {
+            alert('Selecione um paciente válido da lista.');
+            return;
+        }
+
         try {
-            const res = await fetch(API_AGENDA, {
-                method: 'POST',
+            const url = idEdit ? `${API_AGENDA}/${idEdit}` : API_AGENDA;
+            const res = await fetch(url, {
+                method: idEdit ? 'PUT' : 'POST',
                 headers: getAuthHeaders(),
                 body: JSON.stringify(payload)
             });
-
-            if (!res.ok) throw new Error('Erro ao agendar');
-
-            // Feedback de sucesso com maestria
+            if (!res.ok) throw new Error('Erro ao salvar');
             closeModal('eventModal');
             form.reset();
-            
-            // Recarrega agenda e renderiza novamente para mostrar a bolinha rosa
             await buscarAgenda();
             renderizarCalendario();
-
-            // Se o dia da nova sessão for o que está selecionado, atualiza os detalhes
-            if (selectedDate === payload.data_sessao) {
-                exibirDetalhesDia(selectedDate);
-            }
-
-            alert('Sessão agendada com sucesso!');
-            
-        } catch (err) {
-            alert('Falha ao agendar sessão.');
-            console.error(err);
-        }
+            if (selectedDate === payload.data_sessao) exibirDetalhesDia(selectedDate);
+            alert(idEdit ? 'Sessão remarcada!' : 'Sessão agendada!');
+        } catch (err) { alert('Falha ao agendar.'); }
     });
 }
 
+function abrirModalEdicao(sessao) {
+    document.getElementById('id_agenda_edit').value = sessao.id_agenda;
+    document.getElementById('paciente_id').value = sessao.id_paciente;
+    document.getElementById('paciente_search').value = sessao.nome_paciente;
+    document.getElementById('data_sessao').value = sessao.data_sessao;
+    document.getElementById('hora_sessao').value = sessao.hora_sessao.substring(0, 5);
+    document.getElementById('link_sessao').value = sessao.link || '';
+    document.querySelector('.modal-header h3').textContent = 'Remarcar Sessão';
+    openModal('eventModal');
+}
+
+function abrirNovoAgendamento() {
+    const form = document.getElementById('formNovaSessao');
+    form.reset();
+    document.getElementById('id_agenda_edit').value = '';
+    document.getElementById('paciente_id').value = '';
+    document.getElementById('paciente_search').value = '';
+    document.querySelector('.modal-header h3').textContent = 'Novo Agendamento';
+    if (selectedDate) document.getElementById('data_sessao').value = selectedDate;
+    openModal('eventModal');
+}
+
+async function marcarFalta(id) {
+    if (!confirm('Deseja marcar falta?')) return;
+    try {
+        await fetch(`${API_AGENDA}/${id}/status`, {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ status: 'Falta' })
+        });
+        await buscarAgenda();
+        renderizarCalendario();
+        exibirDetalhesDia(selectedDate);
+    } catch (err) { console.error(err); }
+}
+
 function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.style.display = 'flex';
-    setTimeout(() => modal.classList.add('active'), 10);
+    const m = document.getElementById(modalId);
+    m.style.display = 'flex';
+    setTimeout(() => m.classList.add('active'), 10);
 }
 
 function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.remove('active');
-    setTimeout(() => modal.style.display = 'none', 300);
+    const m = document.getElementById(modalId);
+    m.classList.remove('active');
+    setTimeout(() => m.style.display = 'none', 300);
 }
 
-window.onclick = (e) => {
-    if (e.target.classList.contains('modal-overlay')) {
-        const modalId = e.target.id;
-        closeModal(modalId);
-    }
-};
+window.onclick = (e) => { if (e.target.classList.contains('modal-overlay')) closeModal(e.target.id); };

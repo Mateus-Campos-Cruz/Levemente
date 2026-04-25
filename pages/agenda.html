@@ -41,7 +41,7 @@
                 </div>
                 <h2 id="current-month-display">Abril 2026</h2>
             </div>
-            <button class="btn-new-event" onclick="openModal('eventModal')">
+            <button class="btn-new-event" onclick="abrirNovoAgendamento()">
                 <i class="fas fa-plus"></i> <span>Nova Sessão</span>
             </button>
         </header>
@@ -82,11 +82,14 @@
                 <h3>Novo Agendamento</h3>
             </div>
             <form id="formNovaSessao" class="modal-form">
+                <input type="hidden" id="id_agenda_edit">
                 <div class="form-group">
-                    <label for="paciente_id">Paciente</label>
-                    <select id="paciente_id" name="paciente_id" required>
-                        <option value="">Selecione o paciente...</option>
-                    </select>
+                    <label for="paciente_search">Paciente *</label>
+                    <div class="custom-select-container">
+                        <input type="text" id="paciente_search" placeholder="Digite para buscar paciente..." autocomplete="off" required>
+                        <input type="hidden" id="paciente_id">
+                        <div id="paciente_results" class="search-results"></div>
+                    </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -98,9 +101,13 @@
                         <input type="time" id="hora_sessao" name="hora_sessao" required>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="link_sessao">Link da Sessão (Opcional)</label>
+                    <input type="url" id="link_sessao" name="link_sessao" placeholder="https://meet.google.com/...">
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeModal('eventModal')">Cancelar</button>
-                    <button type="submit" class="btn-primary">Confirmar</button>
+                    <button type="submit" class="btn-primary" id="btnConfirmarSessao">Confirmar</button>
                 </div>
             </form>
         </div>

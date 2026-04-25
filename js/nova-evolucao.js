@@ -64,6 +64,7 @@ function configurarFormulario() {
             id_paciente: pacienteId,
             data_sessao: document.getElementById('data_sessao').value,
             tipo_sessao: document.getElementById('tipo_sessao').value,
+            status: document.getElementById('status').value,
             tags: document.getElementById('tags').value.trim(),
             texto_evolucao: document.getElementById('texto_evolucao').value.trim()
         };

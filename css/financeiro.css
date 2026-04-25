@@ -100,7 +100,26 @@
     color: #1e293b;
 }
 
-.btn-icon:hover { transform: scale(1.2); }
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: scale(1.15);
+}
+
+.btn-icon i {
+    font-size: 1.1rem;
+}
 
 /* FILTRO DE PERÍODO (ESTILO AGENDA) */
 .nav-group {
@@ -352,6 +371,65 @@
     outline-color: #db2777;
     cursor: pointer;
     font-size: 0.95rem;
+}
+
+/* SELETOR DE PACIENTE COM BUSCA */
+.custom-select-container {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select-container input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    outline-color: var(--pink-accent);
+    font-size: 0.95rem;
+    background: #f8fafc;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-top: 5px;
+    overflow-y: auto;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    display: none;
+}
+
+.search-results.active {
+    display: block;
+}
+
+.result-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-item:hover {
+    background: #fdf2f8;
+    color: var(--pink-accent);
+}
+
+.result-item.no-results {
+    color: #94a3b8;
+    text-align: center;
+    cursor: default;
 }
 
 .modal-footer {

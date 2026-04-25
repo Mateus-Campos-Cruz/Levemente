@@ -120,10 +120,12 @@
             </div>
             <form id="formFinanceiro" class="modal-form">
                 <div class="form-group">
-                    <label for="id_paciente">Paciente (Opcional)</label>
-                    <select id="id_paciente" class="form-select">
-                        <option value="">Nenhum (Despesa Fixa / Outro)</option>
-                    </select>
+                    <label for="paciente_search">Paciente (Opcional)</label>
+                    <div class="custom-select-container">
+                        <input type="text" id="paciente_search" placeholder="Digite para buscar paciente..." autocomplete="off">
+                        <input type="hidden" id="id_paciente">
+                        <div id="paciente_results" class="search-results"></div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="descricao">Descrição</label>

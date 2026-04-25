@@ -30,7 +30,8 @@ async function carregarEvolucao() {
 
         // Preenche o formulário
         document.getElementById('data_sessao').value = ev.data_sessao; // A API já devolve YYYY-MM-DD
-        document.getElementById('tipo_sessao').value = ev.tipo_sessao || 'Presencial';
+        document.getElementById('tipo_sessao').value = ev.tipo_sessao || 'Individual';
+        document.getElementById('status').value = ev.status || 'Finalizado';
         document.getElementById('tags').value = ev.tags || '';
         document.getElementById('texto_evolucao').value = ev.texto_evolucao || '';
 
@@ -75,6 +76,7 @@ function configurarFormulario() {
         const payload = {
             data_sessao: document.getElementById('data_sessao').value,
             tipo_sessao: document.getElementById('tipo_sessao').value,
+            status: document.getElementById('status').value,
             tags: document.getElementById('tags').value.trim(),
             texto_evolucao: document.getElementById('texto_evolucao').value.trim()
         };

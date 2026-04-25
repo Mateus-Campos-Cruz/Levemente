@@ -42,6 +42,15 @@ async function conectarBanco() {
         // Testa a conexão
         const conn = await pool.getConnection();
         console.log('✅ Conectado ao banco LEVEMENTE');
+        
+        // MIGRATION: Garantir coluna 'status' em evolucoes
+        try {
+            await pool.query("ALTER TABLE evolucoes ADD COLUMN status VARCHAR(20) DEFAULT 'Finalizado' AFTER tags;");
+            console.log('✨ Coluna "status" adicionada em evolucoes.');
+        } catch (e) {
+            // Coluna provavelmente já existe
+        }
+        
         conn.release();
     } catch (err) {
         console.error('❌ Erro ao conectar ao banco:', err.message);
@@ -248,7 +257,11 @@ app.get('/api/pacientes', async (req, res) => {
  * Body: { nome_completo, cpf, telefone, status, data_nascimento?, contato_emergencia? }
  */
 app.post('/api/pacientes', async (req, res) => {
-    const { nome_completo, email, cpf, telefone, status, data_nascimento, contato_emergencia } = req.body;
+    const { 
+        nome_completo, email, cpf, telefone, status, data_nascimento, contato_emergencia,
+        profissao, estado_civil, escolaridade, endereco, 
+        queixa_principal, historico_familiar, medicacoes_em_uso, anamnese_texto 
+    } = req.body;
 
     if (!nome_completo || !cpf) {
         return res.status(400).json({ erro: 'nome_completo e cpf são obrigatórios.' });
@@ -256,8 +269,11 @@ app.post('/api/pacientes', async (req, res) => {
 
     try {
         const [result] = await pool.query(
-            `INSERT INTO pacientes (id_usuario_mestre, nome_completo, email, cpf, telefone, status, data_nascimento, contato_emergencia)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO pacientes (
+                id_usuario_mestre, nome_completo, email, cpf, telefone, status, data_nascimento, contato_emergencia,
+                profissao, estado_civil, escolaridade, endereco, 
+                queixa_principal, historico_familiar, medicacoes_em_uso, anamnese_texto
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 getUserId(req),
                 nome_completo,
@@ -267,6 +283,14 @@ app.post('/api/pacientes', async (req, res) => {
                 status || 'Ativo',
                 data_nascimento || null,
                 contato_emergencia || null,
+                profissao || null,
+                estado_civil || null,
+                escolaridade || null,
+                endereco || null,
+                queixa_principal || null,
+                historico_familiar || null,
+                medicacoes_em_uso || null,
+                anamnese_texto || null,
             ]
         );
 
@@ -335,11 +359,13 @@ app.put('/api/pacientes/:id', async (req, res) => {
         const [result] = await pool.query(
             `UPDATE pacientes 
              SET nome_completo = ?, email = ?, cpf = ?, telefone = ?, status = ?, 
+                 data_nascimento = ?, contato_emergencia = ?,
                  profissao = ?, estado_civil = ?, escolaridade = ?, endereco = ?,
                  queixa_principal = ?, historico_familiar = ?, medicacoes_em_uso = ?, anamnese_texto = ?
              WHERE id_paciente = ? AND id_usuario_mestre = ?`,
             [
-                nome_completo, email || null, cpf, telefone || null, status || 'Ativo', data_nascimento || null, contato_emergencia || null,
+                nome_completo, email || null, cpf, telefone || null, status || 'Ativo', 
+                data_nascimento || null, contato_emergencia || null,
                 profissao || null, estado_civil || null, escolaridade || null, endereco || null,
                 queixa_principal || null, historico_familiar || null, medicacoes_em_uso || null, anamnese_texto || null,
                 id, getUserId(req)
@@ -393,6 +419,58 @@ app.delete('/api/pacientes/:id', async (req, res) => {
 // ─── API: EVOLUÇÕES ───────────────────────────────────────
 
 /**
+ * GET /api/evolucoes
+ * Lista evoluções com paginação, busca e filtros
+ */
+app.get('/api/evolucoes', async (req, res) => {
+    const userId = getUserId(req);
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = parseInt(req.query.offset) || 0;
+    const busca = req.query.busca || '';
+    const status = req.query.status || '';
+
+    try {
+        let query = `
+            FROM evolucoes e
+            JOIN pacientes p ON e.id_paciente = p.id_paciente
+            WHERE e.id_usuario_mestre = ?
+        `;
+        let params = [userId];
+
+        if (busca) {
+            query += ` AND (p.nome_completo LIKE ? OR e.texto_evolucao LIKE ?)`;
+            params.push(`%${busca}%`, `%${busca}%`);
+        }
+        if (status) {
+            query += ` AND e.status = ?`;
+            params.push(status);
+        }
+
+        // Busca Total
+        const [totalRows] = await pool.query(`SELECT COUNT(*) as total ${query}`, params);
+        
+        // Busca Itens
+        const [items] = await pool.query(
+            `SELECT e.id_evolucao, e.id_paciente, p.nome_completo as nome_paciente, 
+                    DATE_FORMAT(e.data_sessao, '%Y-%m-%d') AS data_sessao, 
+                    e.texto_evolucao, e.tipo_sessao, e.status, e.tags 
+             ${query}
+             ORDER BY e.data_sessao DESC, e.id_evolucao DESC
+             LIMIT ? OFFSET ?`,
+            [...params, limit, offset]
+        );
+
+        res.json({
+            total: totalRows[0].total,
+            items: items
+        });
+    } catch (err) {
+        console.error('Erro GET /api/evolucoes:', err.message);
+        res.status(500).json({ erro: 'Erro ao buscar evoluções.' });
+    }
+});
+
+/**
  * GET /api/evolucoes/paciente/:id_paciente
  * Lista evoluções de um paciente específico
  */
@@ -402,7 +480,7 @@ app.get('/api/evolucoes/paciente/:id_paciente', async (req, res) => {
         const [rows] = await pool.query(
             `SELECT id_evolucao, id_paciente, 
                     DATE_FORMAT(data_sessao, '%Y-%m-%d') AS data_sessao, 
-                    texto_evolucao, tipo_sessao, tags
+                    texto_evolucao, tipo_sessao, status, tags
              FROM evolucoes 
              WHERE id_paciente = ? AND id_usuario_mestre = ?
              ORDER BY data_sessao DESC, id_evolucao DESC`,
@@ -425,7 +503,7 @@ app.get('/api/evolucoes/:id', async (req, res) => {
         const [rows] = await pool.query(
             `SELECT id_evolucao, id_paciente, 
                     DATE_FORMAT(data_sessao, '%Y-%m-%d') AS data_sessao, 
-                    texto_evolucao, tipo_sessao, tags
+                    texto_evolucao, tipo_sessao, status, tags
              FROM evolucoes 
              WHERE id_evolucao = ? AND id_usuario_mestre = ?`,
             [id, getUserId(req)]
@@ -445,7 +523,7 @@ app.get('/api/evolucoes/:id', async (req, res) => {
  * Cria uma nova evolução
  */
 app.post('/api/evolucoes', async (req, res) => {
-    const { id_paciente, data_sessao, texto_evolucao, tipo_sessao, tags } = req.body;
+    const { id_paciente, data_sessao, texto_evolucao, tipo_sessao, tags, status } = req.body;
 
     if (!id_paciente || !data_sessao || !texto_evolucao) {
         return res.status(400).json({ erro: 'id_paciente, data_sessao e texto_evolucao são obrigatórios.' });
@@ -453,9 +531,9 @@ app.post('/api/evolucoes', async (req, res) => {
 
     try {
         const [result] = await pool.query(
-            `INSERT INTO evolucoes (id_usuario_mestre, id_paciente, data_sessao, texto_evolucao, tipo_sessao, tags)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [getUserId(req), id_paciente, data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null]
+            `INSERT INTO evolucoes (id_usuario_mestre, id_paciente, data_sessao, texto_evolucao, tipo_sessao, tags, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [getUserId(req), id_paciente, data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null, status || 'Finalizado']
         );
 
         res.status(201).json({ id_evolucao: result.insertId, mensagem: 'Evolução criada com sucesso.' });
@@ -471,7 +549,7 @@ app.post('/api/evolucoes', async (req, res) => {
  */
 app.put('/api/evolucoes/:id', async (req, res) => {
     const { id } = req.params;
-    const { data_sessao, texto_evolucao, tipo_sessao, tags } = req.body;
+    const { data_sessao, texto_evolucao, tipo_sessao, tags, status } = req.body;
 
     if (!data_sessao || !texto_evolucao) {
         return res.status(400).json({ erro: 'data_sessao e texto_evolucao são obrigatórios.' });
@@ -480,9 +558,9 @@ app.put('/api/evolucoes/:id', async (req, res) => {
     try {
         const [result] = await pool.query(
             `UPDATE evolucoes 
-             SET data_sessao = ?, texto_evolucao = ?, tipo_sessao = ?, tags = ?
+             SET data_sessao = ?, texto_evolucao = ?, tipo_sessao = ?, tags = ?, status = ?
              WHERE id_evolucao = ? AND id_usuario_mestre = ?`,
-            [data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null, id, getUserId(req)]
+            [data_sessao, texto_evolucao, tipo_sessao || 'Presencial', tags || null, status || 'Finalizado', id, getUserId(req)]
         );
 
         if (result.affectedRows === 0) {
@@ -727,7 +805,7 @@ app.get('/api/agenda', async (req, res) => {
         const [rows] = await pool.query(
             `SELECT a.id_agenda, a.id_paciente, p.nome_completo AS nome_paciente,
                     DATE_FORMAT(a.data_sessao, '%Y-%m-%d') AS data_sessao,
-                    a.hora_sessao, a.status
+                    a.hora_sessao, a.status, a.link
              FROM agenda a
              JOIN pacientes p ON a.id_paciente = p.id_paciente
              WHERE a.id_usuario_mestre = ?
@@ -746,16 +824,16 @@ app.get('/api/agenda', async (req, res) => {
  * Cria um novo agendamento
  */
 app.post('/api/agenda', async (req, res) => {
-    const { id_paciente, data_sessao, hora_sessao, status } = req.body;
+    const { id_paciente, data_sessao, hora_sessao, status, link } = req.body;
     if (!id_paciente || !data_sessao || !hora_sessao) {
         return res.status(400).json({ erro: 'Paciente, data e hora são obrigatórios.' });
     }
 
     try {
         const [result] = await pool.query(
-            `INSERT INTO agenda (id_usuario_mestre, id_paciente, data_sessao, hora_sessao, status)
-             VALUES (?, ?, ?, ?, ?)`,
-            [getUserId(req), id_paciente, data_sessao, hora_sessao, status || 'Agendada']
+            `INSERT INTO agenda (id_usuario_mestre, id_paciente, data_sessao, hora_sessao, status, link)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [getUserId(req), id_paciente, data_sessao, hora_sessao, status || 'Agendada', link || null]
         );
         res.status(201).json({ id_agenda: result.insertId, mensagem: 'Sessão agendada com sucesso.' });
     } catch (err) {
@@ -784,19 +862,39 @@ app.get('/api/agenda/:id', async (req, res) => {
 
 app.put('/api/agenda/:id', async (req, res) => {
     const { id } = req.params;
-    const { id_paciente, data_sessao, hora_sessao, status } = req.body;
+    const { id_paciente, data_sessao, hora_sessao, status, link } = req.body;
     try {
         const [result] = await pool.query(
             `UPDATE agenda 
-             SET id_paciente = ?, data_sessao = ?, hora_sessao = ?, status = ?
+             SET id_paciente = ?, data_sessao = ?, hora_sessao = ?, status = ?, link = ?
              WHERE id_agenda = ? AND id_usuario_mestre = ?`,
-            [id_paciente, data_sessao, hora_sessao, status, id, getUserId(req)]
+            [id_paciente, data_sessao, hora_sessao, status, link || null, id, getUserId(req)]
         );
         if (result.affectedRows === 0) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
         res.json({ mensagem: 'Agendamento atualizado com sucesso.' });
     } catch (err) {
         console.error('Erro PUT /api/agenda:', err.message);
         res.status(500).json({ erro: 'Erro ao atualizar agendamento.' });
+    }
+});
+
+/**
+ * PATCH /api/agenda/:id/status
+ * Atualiza o status de um agendamento
+ */
+app.patch('/api/agenda/:id/status', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    try {
+        const [result] = await pool.query(
+            'UPDATE agenda SET status = ? WHERE id_agenda = ? AND id_usuario_mestre = ?',
+            [status, id, getUserId(req)]
+        );
+        if (result.affectedRows === 0) return res.status(404).json({ erro: 'Agendamento não encontrado.' });
+        res.json({ mensagem: 'Status atualizado com sucesso.' });
+    } catch (err) {
+        console.error('Erro PATCH /api/agenda/:id/status:', err.message);
+        res.status(500).json({ erro: 'Erro ao atualizar status.' });
     }
 });
 

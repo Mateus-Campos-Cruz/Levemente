@@ -46,6 +46,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 <a href="pacientes.html" class="${isActive('pacientes.html')}">
                     <i class="fas fa-users"></i> Pacientes
                 </a>
+                <a href="evolucoes.html" class="${isActive('evolucoes.html')}">
+                    <i class="fas fa-file-medical"></i> Evoluções
+                </a>
                 <a href="financeiro.html" class="${isActive('financeiro.html')}">
                     <i class="fas fa-wallet"></i> Financeiro
                 </a>

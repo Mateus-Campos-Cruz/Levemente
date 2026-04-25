@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEMENTE | Evoluções</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/evolucoes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar-component"></aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="header-title">
+                <h2>Histórico de Evoluções</h2>
+                <p>Gerencie todos os registros clínicos realizados</p>
+            </div>
+            <div class="user-info">
+                <div class="user-text">
+                    <span id="user-name-display">Mateus</span>
+                    <small>Psicólogo Clínico</small>
+                </div>
+                <div class="avatar" id="user-avatar-display">M</div>
+            </div>
+        </header>
+
+        <section class="content-padding">
+            <div class="filters-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="inputBuscaEvolucoes" placeholder="Pesquisar por paciente, tema ou conteúdo...">
+                </div>
+                <div class="filter-group">
+                    <select id="filtroStatus">
+                        <option value="">Todos os Status</option>
+                        <option value="Finalizado">Finalizados</option>
+                        <option value="Pendente">Pendentes</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="evolucoes-container">
+                <div id="listaEvolucoes" class="evolucoes-grid">
+                    <!-- Populado via JS -->
+                    <div class="loading-state">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <p>Sincronizando registros clínicos...</p>
+                    </div>
+                </div>
+                
+                <div class="pagination-footer">
+                    <button id="btnCarregarMais" class="btn-load-more" style="display: none;">
+                        Ver registros anteriores <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="modalExcluir" class="modal-overlay">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Confirmar Exclusão?</h3>
+            </div>
+            <div class="modal-body">
+                <p>Esta evolução será removida permanentemente do histórico do paciente. Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('modalExcluir')">Manter Registro</button>
+                <button class="btn-danger" id="btnConfirmarExclusao">Excluir Agora</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/components.js"></script>
+    <script src="../js/evolucoes.js"></script>
+</body>
+</html>
